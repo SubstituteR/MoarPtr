@@ -111,8 +111,10 @@ public:
 
 	[[nodiscard]] auto operator->() { return immutable_ptr; }
 
+	virtual void reset_internal(type_identity::type* new_ptr) {};
+
 	[[nodiscard]] auto operator*() { return *immutable_ptr; } /* when T is function* T is disallowed, auto returns T* instead of T for* T for functions. */
-	virtual void reset(type_identity::type* new_ptr) { this->immutable_ptr = new_ptr; }
+	void reset(type_identity::type* new_ptr) { this->immutable_ptr = new_ptr; reset_internal(new_ptr); }
 
 	explicit extern_ptr(void* address)
 	{
@@ -136,6 +138,8 @@ class function_pointer<RT(A...), T2, T3> : public extern_ptr<typename signature<
 		return reinterpret_cast<void*>(reinterpret_cast<int>(GetModuleHandle(module)) + offset);
 	}
 
+	void reset_internal(base::type_identity::type* new_ptr) override { this->mutable_ptr = new_ptr; }
+
 public:
 	explicit function_pointer(void* address) : base(address)
 	{
@@ -145,7 +149,6 @@ public:
 	
 	function_pointer() : function_pointer(nullptr) {};
 
-	void reset(base::type_identity::type* new_ptr) override { base::reset(new_ptr); this->mutable_ptr = new_ptr; }
 
 	[[nodiscard]] auto mut() { return reinterpret_cast<void**>(&mutable_ptr); } /* pointer to the mutable pointer, decayed of all type info. */
 
