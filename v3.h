@@ -112,7 +112,7 @@ public:
 	[[nodiscard]] auto operator->() { return immutable_ptr; }
 
 	[[nodiscard]] auto operator*() { return *immutable_ptr; } /* when T is function* T is disallowed, auto returns T* instead of T for* T for functions. */
-	void reset(type_identity::type* new_ptr) { this->immutable_ptr = new_ptr; }
+	virtual void reset(type_identity::type* new_ptr) { this->immutable_ptr = new_ptr; }
 
 	explicit extern_ptr(void* address)
 	{
@@ -145,7 +145,9 @@ public:
 	
 	function_pointer() : function_pointer(nullptr) {};
 
-	[[nodiscard]] auto mut() { return (void**) &mutable_ptr; } /* pointer to the mutable pointer, decayed of all type info. */
+	void reset(base::type_identity::type* new_ptr) override { base::reset(new_ptr); this->mutable_ptr = new_ptr; }
+
+	[[nodiscard]] auto mut() { return reinterpret_cast<void**>(&mutable_ptr); } /* pointer to the mutable pointer, decayed of all type info. */
 
 	RT operator()(A... args) requires std::is_same_v<void, T3>
 	{
