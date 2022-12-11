@@ -1,3 +1,9 @@
+# Usage
+Copy the headers into an included directory in your project.
+Include the library with 
+```cpp
+#include "moar_ptr.h"
+```
 # Type structure
 ```cpp
 extern_ptr<T> : ∅
@@ -5,7 +11,7 @@ extern_ptr<T> : ∅
 function_ptr<T> : extern_ptr<T>
 ```
 
-# Usage
+# Examples
 
 ## extern_ptr
 This is useful for pointers that are non-owning.
