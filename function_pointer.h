@@ -76,7 +76,7 @@ concept Variadic = std::is_same_v<T, variadic_t> || std::is_same_v<T, void>;
 
 template<Function T1, CallingConvention T2, Variadic T3>
 struct signature {
-	static_assert(sizeof(T2) != 0 || sizeof(T3) == 0, "Illegal Function Signature");
+	static_assert(sizeof(T2) == 0 || sizeof(T3) == 0, "Illegal Function Signature");
 	using type = void; 
 };
 
