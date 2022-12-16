@@ -43,6 +43,8 @@
 #if defined(__clang__) /* Clang does not support B(A)(C...) syntax, only A B(C...) and refuses to compile otherwise. */
 #define FUNCTION_SIGNATURE(x,y,z) y x(z)
 #define FUNCTION_SIGNATURE_VA(x,y,z) y x(z, ...)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wignored-attributes"
 #elif defined(__GNUC__) || defined(_MSC_VER) || defined(__INTEL_COMPILER) /* GCC Supports A B(C...)  and B(A)(C...) but produces wrong T* for T under A B(C...) */
 #define FUNCTION_SIGNATURE(x,y,z) y(x)(z)
 #define FUNCTION_SIGNATURE_VA(x,y,z) y(x)(z,...)
@@ -102,8 +104,10 @@ struct signature<RT(A...), fastcall_t, variadic_t> { using type = FUNCTION_SIGNA
 template<typename RT, typename ...A>
 struct signature<RT(A...), vectorcall_t, void> { using type = FUNCTION_SIGNATURE(CC_VECTORCALL, RT, A...);};
 
+/* vectorcall can't have ..., left here for compatability, probably should warn on use. */
 template<typename RT, typename ...A>
-struct signature<RT(A...), vectorcall_t, variadic_t> { using type = FUNCTION_SIGNATURE_VA(CC_VECTORCALL, RT, A...); };
+struct signature<RT(A...), vectorcall_t, variadic_t> { using type = FUNCTION_SIGNATURE_VA(CC_FASTCALL, RT, A...); };
+/* ------------------------------------------------------------------------------------ */
 
 template<typename RT, typename ...A>
 struct signature<RT(A...), regcall_t, void> { using type = FUNCTION_SIGNATURE(CC_REGCALL, RT, A...);};
@@ -112,6 +116,12 @@ template<typename RT, typename ...A>
 struct signature<RT(A...), regcall_t, variadic_t> { using type = FUNCTION_SIGNATURE_VA(CC_REGCALL, RT, A...); };
 
 #pragma endregion
+
+
+
+#if defined(__clang__) /* Clang does not support B(A)(C...) syntax, only A B(C...) and refuses to compile otherwise. */
+#pragma clang diagnostic pop
+#endif
 
 template<Function T1, CallingConvention T2 = cdecl_t, Variadic T3 = void>
 class function_pointer {};
