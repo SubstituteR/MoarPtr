@@ -73,8 +73,12 @@ concept CallingConvention = std::derived_from<T, calling_convention>;
 template<typename T>
 concept Variadic = std::is_same_v<T, variadic_t> || std::is_same_v<T, void>;
 
+
 template<Function T1, CallingConvention T2, Variadic T3>
-struct signature { };
+struct signature {
+	static_assert(sizeof(T2) != 0 || sizeof(T3) == 0, "Illegal Function Signature");
+	using type = void; 
+};
 
 template<typename RT, typename ...A>
 struct signature<RT(A...), cdecl_t, void> { using type = FUNCTION_SIGNATURE(CC_CDECL, RT, A...); };
@@ -91,10 +95,6 @@ struct signature<RT(A...), stdcall_t, variadic_t> { using type = FUNCTION_SIGNAT
 template<typename RT, typename ...A>
 struct signature<RT(A...), thiscall_t, void> { using type = FUNCTION_SIGNATURE(CC_THISCALL, RT, A...);};
 
-/* thiscall can't have ... on x86, thiscall collapses to fastcall on x64(?), left here for compatability, probably should warn on use. */
-template<typename RT, typename ...A>
-struct signature<RT(A...), thiscall_t, variadic_t> { using type = FUNCTION_SIGNATURE_VA(CC_FASTCALL, RT, A...);};
-/* ----------------------------------------------------------------------------------------------------------------------------------- */
 template<typename RT, typename ...A>
 struct signature<RT(A...), fastcall_t, void> { using type = FUNCTION_SIGNATURE(CC_FASTCALL, RT, A...);};
 
@@ -103,11 +103,6 @@ struct signature<RT(A...), fastcall_t, variadic_t> { using type = FUNCTION_SIGNA
 
 template<typename RT, typename ...A>
 struct signature<RT(A...), vectorcall_t, void> { using type = FUNCTION_SIGNATURE(CC_VECTORCALL, RT, A...);};
-
-/* vectorcall can't have ..., left here for compatability, probably should warn on use. */
-template<typename RT, typename ...A>
-struct signature<RT(A...), vectorcall_t, variadic_t> { using type = FUNCTION_SIGNATURE_VA(CC_FASTCALL, RT, A...); };
-/* ------------------------------------------------------------------------------------ */
 
 template<typename RT, typename ...A>
 struct signature<RT(A...), regcall_t, void> { using type = FUNCTION_SIGNATURE(CC_REGCALL, RT, A...);};
