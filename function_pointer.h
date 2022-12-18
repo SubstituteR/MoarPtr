@@ -40,9 +40,9 @@
 #define CC_VECTORCALL
 #define CC_REGCALL
 #endif
-#if defined(__clang__) /* Clang does not support B(A)(C...) syntax, only A B(C...) and refuses to compile otherwise. */
-#define FUNCTION_SIGNATURE(x,y,z) y x(z)
-#define FUNCTION_SIGNATURE_VA(x,y,z) y x(z, ...)
+#if defined(__clang__ ) /* Clang does not support B(A)(C...) syntax, only A B(C...) and refuses to compile otherwise. */
+#define FUNCTION_SIGNATURE(x,y,z) x y (z)
+#define FUNCTION_SIGNATURE_VA(x,y,z) x y (z, ...)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #elif defined(__GNUC__) || defined(_MSC_VER) || defined(__INTEL_COMPILER) /* GCC Supports A B(C...)  and B(A)(C...) but produces wrong T* for T under A B(C...) */
