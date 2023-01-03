@@ -104,7 +104,7 @@ template<class T1, class T2>
 /* Implementation of std::hash (injected into STD.)
 */
 template<typename T>
-struct std::hash<extern_ptr<T>>
-{
-	std::size_t operator()(extern_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
+struct std::hash<extern_ptr<T>> 
+{ 
+	[[nodiscard]] constexpr auto operator()(extern_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); } 
 };
