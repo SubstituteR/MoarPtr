@@ -48,6 +48,23 @@ void main()
 }
 ```
 
+With a custom calling convention
+```cpp
+__stdcall int add(int a, int b)
+{
+  return a + b;
+}
+
+void main()
+{
+    using namespace moar::types;
+    moar::function_ptr<int(int, int), stdcall_t> add_2_ptr; //the signature of the function uses std::function style syntax.
+    add_2_ptr.reset(add);
+    int result = add_2_ptr(2, 3); //result is 5.
+    return 0;
+}
+```
+
 And with detours
 ```cpp
 int fake_add(int a, int b)
