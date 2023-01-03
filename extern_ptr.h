@@ -43,3 +43,31 @@ private:
 
 template <typename T>
 [[nodiscard]] constexpr auto make_extern(T* pointer) noexcept { return extern_ptr(pointer); }
+
+/*	Explicit implementations of the various comparision operators.
+	https://en.cppreference.com/w/cpp/experimental/observer_ptr/operator_cmp
+*/
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator==(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return p1.get() == p2.get(); }
+
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator!=(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return !(p1 == p2); }
+
+template<class T>
+[[nodiscard]] constexpr auto operator==(const extern_ptr<T>& p, std::nullptr_t) noexcept { return p == nullptr; }
+
+template<class T>
+[[nodiscard]] constexpr auto operator==(std::nullptr_t, const extern_ptr<T>& p) noexcept { return p == nullptr; }
+
+template<class T>
+[[nodiscard]] constexpr auto operator!=(const extern_ptr<T>& p, std::nullptr_t) noexcept { return p != nullptr; }
+
+template<class T>
+[[nodiscard]] constexpr auto operator!=(std::nullptr_t, const extern_ptr<T>& p) noexcept { return p != nullptr; }
+
+/* Explicit implementation of extern_ptr<T> ==/!= T* */
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator==(const extern_ptr<T1>& p1, T2 p2) noexcept requires std::is_pointer_v<T2> { return p1.get() == p2; }
+
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator!=(const extern_ptr<T1>& p1, T2 p2) noexcept requires std::is_pointer_v<T2> { return !(p1 == p2); }
