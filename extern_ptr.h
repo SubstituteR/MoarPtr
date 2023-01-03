@@ -65,9 +65,38 @@ template<class T>
 template<class T>
 [[nodiscard]] constexpr auto operator!=(std::nullptr_t, const extern_ptr<T>& p) noexcept { return p != nullptr; }
 
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator<(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return std::less<std::common_type_t<T1*, T2*>>()(p1.get(), p2.get()); }
+
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator>(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return p2 < p1; }
+
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator<=(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return !(p2 < p1); }
+
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator>=(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return !(p1 < p2); }
+
 /* Explicit implementation of extern_ptr<T> ==/!= T* */
 template<class T1, class T2>
 [[nodiscard]] constexpr auto operator==(const extern_ptr<T1>& p1, T2 p2) noexcept requires std::is_pointer_v<T2> { return p1.get() == p2; }
 
 template<class T1, class T2>
 [[nodiscard]] constexpr auto operator!=(const extern_ptr<T1>& p1, T2 p2) noexcept requires std::is_pointer_v<T2> { return !(p1 == p2); }
+
+/* Handle (extern_ptr<T>, T*) */
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator<(const extern_ptr<T1>& p1, const T2 p2) noexcept requires std::is_pointer_v<T2> { return std::less<std::common_type_t<T1*, T2>>()(p1.get(), p2); }
+
+/* Handle (T*, extern_ptr<T>) */
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator<(const T1 p1, const extern_ptr<T2>& p2) noexcept requires std::is_pointer_v<T1> { return std::less<std::common_type_t<T1, T2*>>()(p1, p2.get()); }
+
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator>(const extern_ptr<T1>& p1, const T2 p2) noexcept requires std::is_pointer_v<T2> { return p2 < p1; }
+
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator<=(const extern_ptr<T1>& p1, const T2 p2) noexcept requires std::is_pointer_v<T2> { return !(p2 < p1); }
+
+template<class T1, class T2>
+[[nodiscard]] constexpr auto operator>=(const extern_ptr<T1>& p1, const T2 p2) noexcept requires std::is_pointer_v<T2> { return !(p1 < p2); }
