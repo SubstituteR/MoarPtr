@@ -20,23 +20,23 @@ A simple case is like so.
 ```cpp
 void main()
 {
-  int my_int = 0; //this could be anything, including variables from other modules.
-  moar::extern_ptr<int> my_int_ptr;
-  my_int_ptr.reset(&my_int);
-  *my_int_ptr = 10; //my_int now equals 10
+    int my_int = 0; //this could be anything, including variables from other modules.
+    moar::extern_ptr<int> my_int_ptr;
+    my_int_ptr.reset(&my_int);
+    *my_int_ptr = 10; //my_int now equals 10
 }
 ```
 
 ## function_ptr
 This is useful for a non-owning pointer to a function.
 
-This additionally has `mut()` for obtaining a mutatable pointer (for hooking/Microsoft Detours,etc.)
+This additionally has `mut()` for obtaining a mutable pointer (for hooking/Microsoft Detours,etc.)
 
 A simple case is like so.
 ```cpp
 int add(int a, int b)
 {
-  return a + b;
+    return a + b;
 }
 
 void main()
@@ -52,7 +52,7 @@ With a custom calling convention
 ```cpp
 __stdcall int add(int a, int b)
 {
-  return a + b;
+    return a + b;
 }
 
 void main()
@@ -69,12 +69,12 @@ And with detours
 ```cpp
 int fake_add(int a, int b)
 {
-  return a - b;
+    return a - b;
 }
 
 int add(int a, int b)
 {
-  return a + b;
+    return a + b;
 }
 
 void main()
