@@ -61,6 +61,9 @@ namespace moar
 		struct fastcall_t : calling_convention {};
 		struct vectorcall_t : calling_convention {};
 		struct regcall_t : calling_convention {};
+
+		using default_variadic = void;
+		using default_calling_convention = cdecl_t;
 	}
 	namespace concepts
 	{
@@ -72,6 +75,9 @@ namespace moar
 
 		template<typename T>
 		concept Variadic = std::is_same_v<T, types::variadic_t> || std::is_same_v<T, void>;
+
+		template<typename T>
+		concept CommonType = CallingConvention<T> || Variadic<T>;
 	}
 #pragma region Helpers
 #if defined(__clang__ ) /* Ignore attribute warnings here to shut Clang up. */
@@ -113,18 +119,64 @@ namespace moar
 
 	template<typename RT, typename ...A>
 	struct signature<RT(A...), types::regcall_t, types::variadic_t> { using type = FUNCTION_SIGNATURE_VA(CC_REGCALL, RT, A...); };
+
+	namespace type_traits
+	{
+		/// <summary>
+		/// Selects T1 or T2 depending on if T1 or T2 is Variadic
+		/// </summary>
+		template<concepts::CommonType T1, concepts::CommonType T2>
+		struct SelectVariadic {
+			static_assert(sizeof(T1) == 0 || sizeof(T2) == 0, "Incorrect Usage of SelectVariadic (T1 and/or T2 missing.)");
+				using type = void;
+		};
+
+		template<concepts::CallingConvention T1, concepts::Variadic T2>
+		struct SelectVariadic<T1, T2> { using type = T2; };
+
+		template<concepts::Variadic T1, concepts::CallingConvention T2>
+		struct SelectVariadic<T1, T2> { using type = T1; };
+
+		/// <summary>
+		/// Selects T1 or T2 depending on if T1 or T2 is a Calling Convention
+		/// </summary>
+		template<concepts::CommonType T1, concepts::CommonType T2>
+		struct SelectCallingConvention {
+			static_assert(sizeof(T1) == 0 || sizeof(T2) == 0, "Incorrect Usage of SelectCallingConvention (T1 and/or T2 missing.)");
+			using type = void;
+		};
+
+		template<concepts::CallingConvention T1, concepts::Variadic T2>
+		struct SelectCallingConvention<T1, T2> { using type = T1; };
+
+		template<concepts::Variadic T1, concepts::CallingConvention T2>
+		struct SelectCallingConvention<T1, T2> { using type = T2; };
+
+		template<typename T>
+		struct SelectDefaultT3 {
+			static_assert(sizeof(T) == 0, "Incorrect Usage of SelectDefaultT3 (T missing.)");
+			using type = void;
+		};
+
+		template<concepts::Variadic T>
+		struct SelectDefaultT3<T> { using type = types::default_calling_convention; };
+
+		template<concepts::CallingConvention T>
+		struct SelectDefaultT3<T> { using type = types::default_variadic; };
+
+	}
 #if defined(__clang__) /* Clang does not support B(A)(C...) syntax, only A B(C...) and refuses to compile otherwise. */
 #pragma clang diagnostic pop
 #endif
 #pragma endregion
 
-	template<concepts::Function T1, concepts::CallingConvention T2 = types::cdecl_t, concepts::Variadic T3 = void>
+	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = typename type_traits::SelectDefaultT3<T2>::type>
 	class function_ptr {};
 
-	template<typename RT, concepts::CallingConvention T2, concepts::Variadic T3, typename ...A>
-	class function_ptr<RT(A...), T2, T3> : public extern_ptr<typename signature<RT(A...), T2, T3>::type> /* typename not declared yet. */
+	template<typename RT, concepts::CommonType T2, concepts::CommonType T3, typename ...A>
+	class function_ptr<RT(A...), T2, T3> : public extern_ptr<typename signature<RT(A...), typename type_traits::SelectCallingConvention<T2,T3>::type, typename type_traits::SelectVariadic<T2, T3>::type>::type> /* typename not declared yet. */
 	{
-		using base = extern_ptr<typename signature<RT(A...), T2, T3>::type>;
+		using base = extern_ptr<typename signature<RT(A...), typename type_traits::SelectCallingConvention<T2, T3>::type, typename type_traits::SelectVariadic<T2, T3>::type>::type>;
 
 		base::type_identity::type* mutable_ptr = 0;
 
