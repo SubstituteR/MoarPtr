@@ -95,7 +95,7 @@ void main()
 
 Currently, my plans for this library are to internalize/hide more of the helper type_traits, possibly in a separate header to clean up the main function_ptr file.
 
-I also wish to move signature<> to it's own header, and possibly clean up the interface for it (maybe rename to function_signature<> as signature<> is a little ambigious.)
+I also wish to move signature<> to its own header, and possibly clean up the interface for it (maybe rename to function_signature<> as signature<> is a little ambiguous.)
 
 Further future plans - unsure, but there are more exotic pointers that can be implemented into this.
 
