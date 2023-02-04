@@ -228,7 +228,7 @@ namespace moar
 		/// </summary>
 		/// <param name="...args">The arguments of the function.</param>
 		/// <returns>The value returned from the function.</returns>
-		RT operator()(A... args) requires std::is_same_v<void, T3>
+		RT operator()(A... args) requires std::is_same_v<void, T3> || std::is_same_v<void, T2>
 		{
 			return base::immutable_ptr(args...);
 		}
@@ -241,7 +241,7 @@ namespace moar
 		/// <param name="...vargs">The variadic arguments of the function.</param>
 		/// <returns>The value returned from the function.</returns>
 		template<typename ...B>
-		RT operator()(A... args, B... vargs) requires std::is_same_v<types::variadic_t, T3>
+		RT operator()(A... args, B... vargs) requires std::is_same_v<types::variadic_t, T3> || std::is_same_v<types::variadic_t, T2>
 		{
 			return base::immutable_ptr(args..., vargs...);
 		}
@@ -264,7 +264,7 @@ namespace moar
 		/// <param name="...vargs">The variadic arguments of the function.</param>
 		/// <returns>The value returned from the function.</returns>
 		template<typename ...B>
-		RT original(A... args, B... vargs) requires std::is_same_v<types::variadic_t, T3>
+		RT original(A... args, B... vargs) requires std::is_same_v<types::variadic_t, T3> || std::is_same_v<types::variadic_t, T2>
 		{
 			return mutable_ptr(args..., vargs...);
 		}
