@@ -176,21 +176,12 @@ namespace moar
 	template<typename RT, concepts::CommonType T2, concepts::CommonType T3, typename ...A>
 	class function_ptr<RT(A...), T2, T3> : public extern_ptr<typename signature<RT(A...), typename type_traits::SelectCallingConvention<T2,T3>::type, typename type_traits::SelectVariadic<T2, T3>::type>::type> /* typename not declared yet. */
 	{
-		using base = extern_ptr<typename signature<RT(A...), typename type_traits::SelectCallingConvention<T2, T3>::type, typename type_traits::SelectVariadic<T2, T3>::type>::type>;
-
-		base::type_identity::type* mutable_ptr = 0;
-
-		void reset_internal(base::type_identity::type* new_ptr) override { this->mutable_ptr = new_ptr; }
-
-		static inline auto from_module(LPCTSTR module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<int>(GetModuleHandle(module)) + rva); }
-		static inline auto from_virtual(void* object, int vfti) -> void* { return (*reinterpret_cast<void***>(object))[vfti]; }
-
 	public:
 		/// <summary>
 		/// Construct a function_pointer by raw address.
 		/// </summary>
 		/// <param name="address">The address to set the immutable and mutable pointers to.</param>
-		explicit function_ptr(void* address) : base(address) { mutable_ptr = reinterpret_cast<base::type_identity::type*>(address); }
+		explicit function_ptr(void* address) : base(address) { mutable_ptr = reinterpret_cast<base::element_type*>(address); }
 
 		/// <summary>
 		/// Construct a function_pointer by module name and relative virtual address.
@@ -268,7 +259,15 @@ namespace moar
 		{
 			return mutable_ptr(args..., vargs...);
 		}
+	private:
+		using base = extern_ptr<typename signature<RT(A...), typename type_traits::SelectCallingConvention<T2, T3>::type, typename type_traits::SelectVariadic<T2, T3>::type>::type>;
 
+		base::element_type* mutable_ptr = 0;
+
+		void reset_internal(base::element_type* new_ptr) override { this->mutable_ptr = new_ptr; }
+
+		static inline auto from_module(LPCTSTR module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<int>(GetModuleHandle(module)) + rva); }
+		static inline auto from_virtual(void* object, int vfti) -> void* { return (*reinterpret_cast<void***>(object))[vfti]; }
 	};
 
 	/* Implementation of std::hash (injected into STD.)

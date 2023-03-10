@@ -8,19 +8,18 @@ namespace moar
 	template<typename T>
 	class extern_ptr
 	{
-	protected:
-		struct type_identity { using type = T; };
-		type_identity::type* immutable_ptr;
 	public:
 
-		constexpr type_identity::type* release() noexcept { auto rt = get(); reset(); return rt; }
+		using element_type = std::remove_extent_t<T>;
 
-		constexpr void reset(type_identity::type* new_ptr = nullptr) noexcept { this->immutable_ptr = new_ptr; reset_internal(new_ptr); }
+		constexpr element_type* release() noexcept { auto rt = get(); reset(); return rt; }
 
-		constexpr void swap(extern_ptr<typename type_identity::type>& other) noexcept
+		constexpr void reset(element_type* new_ptr = nullptr) noexcept { this->immutable_ptr = new_ptr; reset_internal(new_ptr); }
+
+		constexpr void swap(extern_ptr<element_type>& other) noexcept
 		{
-			typename type_identity::type* first = get();
-			typename type_identity::type* second = other.get();
+			element_type* first = get();
+			element_type* second = other.get();
 			reset(second);
 			other.reset(first);
 		}
@@ -35,12 +34,15 @@ namespace moar
 
 		[[nodiscard]] constexpr explicit operator auto () const noexcept { return get(); };
 
-		explicit extern_ptr(void* address) { immutable_ptr = reinterpret_cast<type_identity::type*>(address); }
+		explicit extern_ptr(void* address) { immutable_ptr = reinterpret_cast<element_type*>(address); }
 
 		extern_ptr() : extern_ptr(nullptr) {};
 
+	protected:
+		element_type* immutable_ptr;
+
 	private:
-		virtual void reset_internal(type_identity::type* new_ptr) {};
+		virtual void reset_internal(element_type* new_ptr) {};
 	};
 
 	template <typename T>
