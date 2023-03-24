@@ -104,12 +104,11 @@ namespace moar
 
 	template<class T1, class T2>
 	[[nodiscard]] constexpr auto operator>=(const extern_ptr<T1>& p1, const T2 p2) noexcept requires std::is_pointer_v<T2> { return !(p1 < p2); }
-
-	/* Implementation of std::hash (injected into STD.)
-	*/
-	template<typename T>
-	struct std::hash<extern_ptr<T>>
-	{
-		[[nodiscard]] constexpr auto operator()(moar::extern_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
-	};
 }
+/* Implementation of std::hash (injected into STD.)
+*/
+template<typename T>
+struct std::hash<moar::extern_ptr<T>>
+{
+	[[nodiscard]] constexpr auto operator()(moar::extern_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
+};

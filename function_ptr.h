@@ -107,12 +107,11 @@ namespace moar
 		static inline auto from_module(LPCTSTR module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<int>(GetModuleHandle(module)) + rva); }
 		static inline auto from_virtual(void* object, int vfti) -> void* { return (*reinterpret_cast<void***>(object))[vfti]; }
 	};
-
-	/* Implementation of std::hash (injected into STD.)
-	*/
-	template<typename T>
-	struct std::hash<function_ptr<T>>
-	{
-		std::size_t operator()(moar::function_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
-	};
 }
+/* Implementation of std::hash (injected into STD.)
+*/
+template<typename T>
+struct std::hash<moar::function_ptr<T>>
+{
+	std::size_t operator()(moar::function_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
+};
