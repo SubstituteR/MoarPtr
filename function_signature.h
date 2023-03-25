@@ -35,17 +35,15 @@
 #define CC_VECTORCALL
 #define CC_REGCALL
 #endif
-#if defined(__clang__ ) /* Clang does not support B(A)(C...) syntax, only A B(C...) and refuses to compile otherwise. */
-#define FUNCTION_SIGNATURE(x,y,z) x y (z)
-#define FUNCTION_SIGNATURE_VA(x,y,z) x y (z, ...)
-#elif defined(__GNUC__) || defined(_MSC_VER) || defined(__INTEL_COMPILER) /* GCC Supports A B(C...)  and B(A)(C...) but produces wrong T* for T under A B(C...) */
-#define FUNCTION_SIGNATURE(x,y,z) y(x)(z)
-#define FUNCTION_SIGNATURE_VA(x,y,z) y(x)(z,...)
-#endif
 
-#if defined(__clang__ ) /* Ignore attribute warnings here to shut Clang up. */
+#if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wignored-attributes"
+#endif
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
 #endif
 
 #pragma endregion
@@ -60,38 +58,37 @@ namespace moar
 	};
 
 	template<typename RT, typename ...A>
-	struct function_signature<RT(A...), types::cdecl_t, void> { using type = FUNCTION_SIGNATURE(CC_CDECL, RT, A...); };
+	struct function_signature<RT(A...), types::cdecl_t, void> { using type = RT CC_CDECL(A...); };
 
 	template<typename RT, typename ...A>
-	struct function_signature<RT(A...), types::cdecl_t, types::variadic_t> { using type = FUNCTION_SIGNATURE_VA(CC_CDECL, RT, A...); };
+	struct function_signature<RT(A...), types::cdecl_t, types::variadic_t> { using type = RT CC_CDECL(A..., ...); };
 
 	template<typename RT, typename ...A>
-	struct function_signature<RT(A...), types::stdcall_t, void> { using type = FUNCTION_SIGNATURE(CC_STDCALL, RT, A...); };
+	struct function_signature<RT(A...), types::stdcall_t, void> { using type = RT CC_STDCALL(A...); };
+
 
 	template<typename RT, typename ...A>
-	struct function_signature<RT(A...), types::stdcall_t, types::variadic_t> { using type = FUNCTION_SIGNATURE_VA(CC_STDCALL, RT, A...); };
+	struct function_signature<RT(A...), types::thiscall_t, void> { using type = RT CC_THISCALL(A...); };
 
 	template<typename RT, typename ...A>
-	struct function_signature<RT(A...), types::thiscall_t, void> { using type = FUNCTION_SIGNATURE(CC_THISCALL, RT, A...); };
+	struct function_signature<RT(A...), types::fastcall_t, void> { using type = RT CC_FASTCALL(A...); };
 
 	template<typename RT, typename ...A>
-	struct function_signature<RT(A...), types::fastcall_t, void> { using type = FUNCTION_SIGNATURE(CC_FASTCALL, RT, A...); };
+	struct function_signature<RT(A...), types::vectorcall_t, void> { using type = RT CC_VECTORCALL(A...); };
 
 	template<typename RT, typename ...A>
-	struct function_signature<RT(A...), types::fastcall_t, types::variadic_t> { using type = FUNCTION_SIGNATURE_VA(CC_FASTCALL, RT, A...); };
+	struct function_signature<RT(A...), types::regcall_t, void> { using type = RT CC_REGCALL(A...); };
 
 	template<typename RT, typename ...A>
-	struct function_signature<RT(A...), types::vectorcall_t, void> { using type = FUNCTION_SIGNATURE(CC_VECTORCALL, RT, A...); };
-
-	template<typename RT, typename ...A>
-	struct function_signature<RT(A...), types::regcall_t, void> { using type = FUNCTION_SIGNATURE(CC_REGCALL, RT, A...); };
-
-	template<typename RT, typename ...A>
-	struct function_signature<RT(A...), types::regcall_t, types::variadic_t> { using type = FUNCTION_SIGNATURE_VA(CC_REGCALL, RT, A...); };
+	struct function_signature<RT(A...), types::regcall_t, types::variadic_t> { using type = RT CC_REGCALL(A..., ...); };
 }
 
 
 #pragma region Undefinitions
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
