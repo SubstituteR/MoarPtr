@@ -80,6 +80,9 @@ namespace moar
 
 	template<typename RT, typename ...A>
 	struct function_signature<RT(A...), types::regcall_t, types::variadic_t> { using type = RT CC_REGCALL(A..., ...); };
+
+	template<concepts::Function T1, concepts::CallingConvention T2, concepts::Variadic T3>
+	using function_signature_t = typename function_signature<T1, T2, T3>::type;
 }
 
 

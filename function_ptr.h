@@ -8,11 +8,11 @@
 
 namespace moar
 {
-	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = typename type_traits::SelectDefaultT3<T2>::type>
+	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
 	class function_ptr {};
 
 	template<typename RT, concepts::CommonType T2, concepts::CommonType T3, typename ...A>
-	class function_ptr<RT(A...), T2, T3> : public extern_ptr<typename function_signature<RT(A...), typename type_traits::SelectCallingConvention<T2,T3>::type, typename type_traits::SelectVariadic<T2, T3>::type>::type> /* typename not declared yet. */
+	class function_ptr<RT(A...), T2, T3> : public extern_ptr<function_signature_t<RT(A...), type_traits::select_calling_convention_t<T2,T3>, type_traits::select_variadic_t<T2, T3>>> /* typename not declared yet. */
 	{
 	public:
 		/// <summary>
@@ -98,7 +98,7 @@ namespace moar
 			return mutable_ptr(args..., vargs...);
 		}
 	private:
-		using base = extern_ptr<typename function_signature<RT(A...), typename type_traits::SelectCallingConvention<T2, T3>::type, typename type_traits::SelectVariadic<T2, T3>::type>::type>;
+		using base = extern_ptr<function_signature_t<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>>;
 
 		base::element_type* mutable_ptr = 0;
 
