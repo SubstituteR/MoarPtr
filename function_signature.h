@@ -66,7 +66,6 @@ namespace moar
 	template<typename RT, typename ...A>
 	struct function_signature<RT(A...), types::stdcall_t, void> { using type = RT CC_STDCALL(A...); };
 
-
 	template<typename RT, typename ...A>
 	struct function_signature<RT(A...), types::thiscall_t, void> { using type = RT CC_THISCALL(A...); };
 
