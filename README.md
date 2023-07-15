@@ -1,19 +1,23 @@
-# Usage
-Copy the headers into an included directory in your project.
-Include the library with 
-```cpp
-#include "moar_ptr.h"
-```
-# Type structure
-```cpp
-extern_ptr<T> : ∅
+# MoarPtr
 
-function_ptr<T> : extern_ptr<T>
-```
+## About
 
-# Examples
+MoarPtr is a header-only library that adds `observer_ptr` (named `extern_ptr`) and `function_ptr` which wraps around function pointers in an idiomatic C++ way.
 
-## extern_ptr
+Additionally, helper types are added, such as `function_signature` and common calling conventions `convention_t`.
+
+## Requirements
+C++20
+
+## Known Issues
+`thiscall_t` on MSVC causes a compiler error. This is a bug in MSVC.
+
+## Usage
+Copy the headers into an included directory in your project and `#include moar_ptr.h` the library:
+
+## Examples
+
+### extern_ptr
 This is useful for pointers that are non-owning.
 
 A simple case is like so.
@@ -27,7 +31,7 @@ void main()
 }
 ```
 
-## function_ptr
+### function_ptr
 This is useful for a non-owning pointer to a function.
 
 This additionally has `mut()` for obtaining a mutable pointer (for hooking/Microsoft Detours,etc.)
@@ -85,20 +89,8 @@ void main()
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
     DetourAttach(add_2_ptr.mut(), fake_add);
-    
+    DetourTransactionCommit();
     int result = add_2_ptr(2, 3); //result is -1.
     return 0;
 }
 ```
-
-# Roadmap
-
-~~Currently, my plans for this library are to internalize/hide more of the helper type_traits, possibly in a separate header to clean up the main function_ptr file.~~ Complete
-
-~~I also wish to move signature<> to its own header, and possibly clean up the interface for it (maybe rename to function_signature<> as signature<> is a little ambiguous.)~~ Complete
-
-Further future plans - unsure, but there are more exotic pointers that can be implemented into this.
-
-PRs are always accepted, coding standards are follow-what-you-see.
-
-More documentation and examples to come!
