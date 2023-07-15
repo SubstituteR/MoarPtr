@@ -2,24 +2,27 @@
 #include <concepts>
 #include <functional>
 #include <type_traits>
+#include "./moar_ptr.h"
+
 namespace moar
 {
 	/* https://en.cppreference.com/w/cpp/experimental/observer_ptr */
 	template<typename T>
 	class extern_ptr
 	{
+	protected:
+		struct type_identity { using type = T; };
+		type_identity::type* immutable_ptr;
 	public:
 
-		using element_type = std::remove_extent_t<T>;
+		constexpr type_identity::type* release() noexcept { auto rt = get(); reset(); return rt; }
 
-		constexpr element_type* release() noexcept { auto rt = get(); reset(); return rt; }
+		constexpr void reset(type_identity::type* new_ptr = nullptr) noexcept { this->immutable_ptr = new_ptr; reset_internal(new_ptr); }
 
-		constexpr void reset(element_type* new_ptr = nullptr) noexcept { this->immutable_ptr = new_ptr; reset_internal(new_ptr); }
-
-		constexpr void swap(extern_ptr<element_type>& other) noexcept
+		constexpr void swap(extern_ptr<typename type_identity::type>& other) noexcept
 		{
-			element_type* first = get();
-			element_type* second = other.get();
+			typename type_identity::type* first = get();
+			typename type_identity::type* second = other.get();
 			reset(second);
 			other.reset(first);
 		}
@@ -34,81 +37,35 @@ namespace moar
 
 		[[nodiscard]] constexpr explicit operator auto () const noexcept { return get(); };
 
-		explicit extern_ptr(void* address) { immutable_ptr = reinterpret_cast<element_type*>(address); }
+		explicit extern_ptr(void* address) { immutable_ptr = reinterpret_cast<type_identity::type*>(address); }
 
 		extern_ptr() : extern_ptr(nullptr) {};
 
-	protected:
-		element_type* immutable_ptr;
 
 	private:
-		virtual void reset_internal(element_type* new_ptr) {};
+		virtual void reset_internal(type_identity::type* new_ptr) {};
 	};
 
 	template <typename T>
 	[[nodiscard]] constexpr auto make_extern(T* pointer) noexcept { return extern_ptr(pointer); }
 
-	/*	Explicit implementations of the various comparision operators.
-		https://en.cppreference.com/w/cpp/experimental/observer_ptr/operator_cmp
-	*/
 	template<class T1, class T2>
 	[[nodiscard]] constexpr auto operator==(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return p1.get() == p2.get(); }
 
 	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator!=(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return !(p1 == p2); }
+	[[nodiscard]] constexpr auto operator<=>(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return p1.get() <=> p2.get(); }
 
-	template<class T>
-	[[nodiscard]] constexpr auto operator==(const extern_ptr<T>& p, std::nullptr_t) noexcept { return p == nullptr; }
-
-	template<class T>
-	[[nodiscard]] constexpr auto operator==(std::nullptr_t, const extern_ptr<T>& p) noexcept { return p == nullptr; }
-
-	template<class T>
-	[[nodiscard]] constexpr auto operator!=(const extern_ptr<T>& p, std::nullptr_t) noexcept { return p != nullptr; }
-
-	template<class T>
-	[[nodiscard]] constexpr auto operator!=(std::nullptr_t, const extern_ptr<T>& p) noexcept { return p != nullptr; }
-
-	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator<(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return std::less<std::common_type_t<T1*, T2*>>()(p1.get(), p2.get()); }
-
-	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator>(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return p2 < p1; }
-
-	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator<=(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return !(p2 < p1); }
-
-	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator>=(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return !(p1 < p2); }
-
-	/* Explicit implementation of extern_ptr<T> ==/!= T* */
 	template<class T1, class T2>
 	[[nodiscard]] constexpr auto operator==(const extern_ptr<T1>& p1, T2 p2) noexcept requires std::is_pointer_v<T2> { return p1.get() == p2; }
 
 	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator!=(const extern_ptr<T1>& p1, T2 p2) noexcept requires std::is_pointer_v<T2> { return !(p1 == p2); }
+	[[nodiscard]] constexpr auto operator<=>(const extern_ptr<T1>& p1, T2 p2) noexcept requires std::is_pointer_v<T2> { return p1.get() <=> p2; }
 
-	/* Handle (extern_ptr<T>, T*) */
-	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator<(const extern_ptr<T1>& p1, const T2 p2) noexcept requires std::is_pointer_v<T2> { return std::less<std::common_type_t<T1*, T2>>()(p1.get(), p2); }
-
-	/* Handle (T*, extern_ptr<T>) */
-	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator<(const T1 p1, const extern_ptr<T2>& p2) noexcept requires std::is_pointer_v<T1> { return std::less<std::common_type_t<T1, T2*>>()(p1, p2.get()); }
-
-	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator>(const extern_ptr<T1>& p1, const T2 p2) noexcept requires std::is_pointer_v<T2> { return p2 < p1; }
-
-	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator<=(const extern_ptr<T1>& p1, const T2 p2) noexcept requires std::is_pointer_v<T2> { return !(p2 < p1); }
-
-	template<class T1, class T2>
-	[[nodiscard]] constexpr auto operator>=(const extern_ptr<T1>& p1, const T2 p2) noexcept requires std::is_pointer_v<T2> { return !(p1 < p2); }
+	/* Implementation of std::hash (injected into STD.)
+	*/
+	template<typename T>
+	struct std::hash<extern_ptr<T>>
+	{
+		[[nodiscard]] constexpr auto operator()(moar::extern_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
+	};
 }
-/* Implementation of std::hash (injected into STD.)
-*/
-template<typename T>
-struct std::hash<moar::extern_ptr<T>>
-{
-	[[nodiscard]] constexpr auto operator()(moar::extern_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
-};
