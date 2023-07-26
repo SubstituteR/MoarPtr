@@ -94,3 +94,6 @@ void main()
     return 0;
 }
 ```
+
+## Future Plans
+Implement support for member functions using similar logic as `std::invoke`.
