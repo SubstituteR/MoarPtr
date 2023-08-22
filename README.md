@@ -22,12 +22,13 @@ This is useful for pointers that are non-owning.
 
 A simple case is like so.
 ```cpp
-void main()
+int main()
 {
     int my_int = 0; //this could be anything, including variables from other modules.
     moar::extern_ptr<int> my_int_ptr;
     my_int_ptr.reset(&my_int);
     *my_int_ptr = 10; //my_int now equals 10
+    return 0;
 }
 ```
 
@@ -43,7 +44,7 @@ int add(int a, int b)
     return a + b;
 }
 
-void main()
+int main()
 {
     moar::function_ptr<int(int, int)> add_2_ptr; //the signature of the function uses std::function style syntax.
     add_2_ptr.reset(add);
@@ -59,7 +60,7 @@ __stdcall int add(int a, int b)
     return a + b;
 }
 
-void main()
+int main()
 {
     using namespace moar::types;
     moar::function_ptr<int(int, int), stdcall_t> add_2_ptr; //the signature of the function uses std::function style syntax.
@@ -81,16 +82,32 @@ int add(int a, int b)
     return a + b;
 }
 
-void main()
+int multiply(int a, int b)
+{
+    return a * b;
+}
+
+moar::function_ptr<int(int, int)> multiply_2_ptr;
+int hooked_multiply(int a, int b)
+{
+    return multiply_2_ptr.original(10, 10);
+}
+
+int main()
 {
     moar::function_ptr<int(int, int)> add_2_ptr; //the signature of the function uses std::function style syntax.
+
     add_2_ptr.reset(add);
+    multiply_2_ptr.reset(multiply);
     
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
     DetourAttach(add_2_ptr.mut(), fake_add);
+    DetourAttach(multiply_2_ptr.mut(), hooked_multiply);
     DetourTransactionCommit();
-    int result = add_2_ptr(2, 3); //result is -1.
+    std::cout << add_2_ptr(2, 3) << "\n"; //-1
+    std::cout << multiply_2_ptr(3, 3) << "\n"; //100
+    std::cout << multiply_2_ptr.original(3, 3) << "\n"; //9
     return 0;
 }
 ```
