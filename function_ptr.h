@@ -26,7 +26,8 @@ namespace moar
 		/// </summary>
 		/// <param name="module">The name of the module that should be used as the image base.</param>
 		/// <param name="rva">The relative virtual address from the image base.</param>
-		function_ptr(LPCTSTR module, int rva) : function_ptr(from_module(module, rva)) { /*NOP*/ }
+		template<concepts::ModuleName T>
+		function_ptr(T module, int rva) : function_ptr(from_module(module, rva)) { /*NOP*/ }
 
 		/// <summary>
 		/// Construct a function_pointer by object reference and virtual function table index.
