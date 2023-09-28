@@ -108,6 +108,15 @@ namespace moar
 		static inline auto from_module(LPCTSTR module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<int>(GetModuleHandle(module)) + rva); }
 		static inline auto from_virtual(void* object, int vfti) -> void* { return (*reinterpret_cast<void***>(object))[vfti]; }
 	};
+
+	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
+	[[nodiscard]] constexpr auto make_function_ptr(void* address) noexcept { return function_ptr<T1, T2, T3>{address}; }
+
+	template<concepts::ModuleName T, concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
+	[[nodiscard]] constexpr auto make_function_ptr(T module, int rva) noexcept { auto address = reinterpret_cast<void*>(reinterpret_cast<int>(GetModuleHandle(module)) + rva); return function_ptr<T1, T2, T3>{address}; }
+
+	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
+	[[nodiscard]] constexpr auto make_function_ptr(void* object, int vfti) noexcept { auto address = (*reinterpret_cast<void***>(object))[vfti]; return function_ptr<T1, T2, T3>{address}; }
 }
 /* Implementation of std::hash (injected into STD.)
 */
