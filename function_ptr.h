@@ -101,7 +101,7 @@ namespace moar
 	private:
 		using base = extern_ptr<function_signature_t<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>>;
 
-		base::element_type* mutable_ptr = 0;
+		base::element_type* mutable_ptr = nullptr;
 
 		void reset_internal(base::element_type* new_ptr) override { this->mutable_ptr = new_ptr; }
 
