@@ -16,6 +16,8 @@ namespace moar
 
 		constexpr void reset(element_type* new_ptr = nullptr) noexcept { this->immutable_ptr = new_ptr; reset_internal(new_ptr); }
 
+		constexpr void reset(void* new_ptr = nullptr) noexcept { this->immutable_ptr = reinterpret_cast<element_type*>(new_ptr); reset_internal(reinterpret_cast<element_type*>(new_ptr)); }
+
 		constexpr void swap(extern_ptr<element_type>& other) noexcept
 		{
 			element_type* first = get();

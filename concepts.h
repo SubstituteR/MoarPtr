@@ -19,7 +19,7 @@ namespace moar
 		template<typename T>
 		concept CommonType = CallingConvention<T> || Variadic<T>;
 
-                template<typename T>
-                concept ModuleName = std::is_same_v<T, LPCTSTR> || std::is_same_v<T, nullptr_t>;
+		template<typename T>
+		concept ModuleName = std::is_same_v<T, nullptr_t> || std::is_same_v<T, const char*> || std::is_same_v<T, const wchar_t*>;
 	}
 }
