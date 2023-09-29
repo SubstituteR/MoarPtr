@@ -105,7 +105,7 @@ namespace moar
 
 		void reset_internal(base::element_type* new_ptr) override { this->mutable_ptr = new_ptr; }
 
-		static inline auto from_module(LPCTSTR module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<int>(GetModuleHandle(module)) + rva); }
+		static inline auto from_module(LPCTSTR module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandle(module)) + rva); }
 		static inline auto from_virtual(void* object, int vfti) -> void* { return (*reinterpret_cast<void***>(object))[vfti]; }
 	};
 
