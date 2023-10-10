@@ -16,6 +16,12 @@ namespace moar
 	{
 	public:
 		/// <summary>
+		/// Set the internal pointers to a raw address
+		/// </summary>
+		/// <param name="new_ptr">The address to set the immutable and mutable pointers to.</param>
+		constexpr void reset(void* new_ptr = nullptr) noexcept { base::reset(reinterpret_cast<base::element_type*>(new_ptr)); }
+
+		/// <summary>
 		/// Construct a function_pointer by raw address.
 		/// </summary>
 		/// <param name="address">The address to set the immutable and mutable pointers to.</param>
@@ -105,7 +111,8 @@ namespace moar
 
 		void reset_internal(base::element_type* new_ptr) override { this->mutable_ptr = new_ptr; }
 
-		static inline auto from_module(LPCTSTR module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandle(module)) + rva); }
+		template <concepts::ModuleName T>
+		static inline auto from_module(T module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandle(module)) + rva); }
 		static inline auto from_virtual(void* object, int vfti) -> void* { return (*reinterpret_cast<void***>(object))[vfti]; }
 	};
 

@@ -3,6 +3,10 @@
 #include <functional>
 #include "moar_ptr.h"
 
+#if _WIN32
+#include "Windows.h"
+#endif
+
 namespace moar
 {
 	namespace concepts
@@ -18,8 +22,12 @@ namespace moar
 
 		template<typename T>
 		concept CommonType = CallingConvention<T> || Variadic<T>;
-
+#ifdef _WIN32
 		template<typename T>
-		concept ModuleName = std::is_same_v<T, nullptr_t> || std::is_same_v<T, const char*> || std::is_same_v<T, const wchar_t*>;
+		concept ModuleName = std::is_same_v<T, nullptr_t> || std::is_same_v<T, LPCTSTR>;
+#else
+		template<typename T>
+		concept ModuleName = std::is_same_v<T, nullptr_t> || std::is_same_v<T, const char*>;
+#endif // WIN32
 	}
 }
