@@ -46,7 +46,8 @@ namespace moar
 	};
 
 	template <typename T>
-	[[nodiscard]] constexpr auto make_extern(T* pointer) noexcept { return extern_ptr(pointer); }
+	[[nodiscard]] constexpr auto make_extern(T* pointer) noexcept { return extern_ptr<T>{ pointer }; }
+
 	template<class T1, class T2>
 	[[nodiscard]] constexpr auto operator==(const extern_ptr<T1>& p1, const extern_ptr<T2>& p2) noexcept { return p1.get() == p2.get(); }
 
