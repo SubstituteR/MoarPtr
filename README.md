@@ -9,6 +9,9 @@ Additionally, helper types are added, such as `function_signature` and common ca
 ## Requirements
 C++20
 
+## Supported Operating Systems
+Windows
+
 ## Known Issues
 `thiscall_t` on MSVC causes a compiler error. This is a bug in MSVC.
 
