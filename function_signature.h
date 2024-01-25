@@ -19,7 +19,7 @@
 #elif defined(_MSC_VER) || defined(__INTEL_COMPILER)
 #define CC_CDECL __cdecl
 #define CC_STDCALL __stdcall
-#define CC_THISCALL __thiscall
+#define CC_THISCALL __fastcall // temporary compiler fix for https://github.com/SubstituteR/MoarPtr/issues/4
 #define CC_FASTCALL __fastcall
 #define CC_VECTORCALL __vectorcall
 #if defined(__INTEL_COMPILER)
