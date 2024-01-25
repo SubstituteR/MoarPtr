@@ -16,6 +16,12 @@ namespace moar
 	{
 	public:
 		/// <summary>
+		/// Set the internal pointers to a raw address
+		/// </summary>
+		/// <param name="new_ptr">The address to set the immutable and mutable pointers to.</param>
+		constexpr void reset(void* new_ptr = nullptr) noexcept { base::reset(reinterpret_cast<base::element_type*>(new_ptr)); }
+
+		/// <summary>
 		/// Construct a function_pointer by raw address.
 		/// </summary>
 		/// <param name="address">The address to set the immutable and mutable pointers to.</param>
@@ -101,13 +107,23 @@ namespace moar
 	private:
 		using base = extern_ptr<function_signature_t<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>>;
 
-		base::element_type* mutable_ptr = 0;
+		base::element_type* mutable_ptr = nullptr;
 
 		void reset_internal(base::element_type* new_ptr) override { this->mutable_ptr = new_ptr; }
 
-		static inline auto from_module(LPCTSTR module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<int>(GetModuleHandle(module)) + rva); }
+		template <concepts::ModuleName T>
+		static inline auto from_module(T module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandle(module)) + rva); }
 		static inline auto from_virtual(void* object, int vfti) -> void* { return (*reinterpret_cast<void***>(object))[vfti]; }
 	};
+
+	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
+	[[nodiscard]] constexpr auto make_function_ptr(void* address) noexcept { return function_ptr<T1, T2, T3>{address}; }
+
+	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>, concepts::ModuleName T>
+	[[nodiscard]] constexpr auto make_function_ptr(T module, int rva) noexcept { return function_ptr<T1, T2, T3>{ module, rva }; }
+
+	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
+	[[nodiscard]] constexpr auto make_function_ptr(void* object, int vfti) noexcept { return function_ptr<T1, T2, T3>{ object, vfti }; }
 }
 /* Implementation of std::hash (injected into STD.)
 */
