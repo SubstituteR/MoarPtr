@@ -12,9 +12,6 @@ C++20
 ## Supported Operating Systems
 Windows
 
-## Known Issues
-`thiscall_t` on MSVC causes a compiler error. This is a bug in MSVC.
-
 ## Usage
 Copy the headers into an included directory in your project and `#include moar_ptr.h` the library:
 
