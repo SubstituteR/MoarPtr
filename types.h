@@ -19,5 +19,12 @@ namespace moar
 
 		using default_variadic = void;
 		using default_calling_convention = cdecl_t;
+
+		template<concepts::Class C, typename T>
+		struct member_t
+		{
+			using Class = C;
+			using Type = T;
+		};
 	}
 }
