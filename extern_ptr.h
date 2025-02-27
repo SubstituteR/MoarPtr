@@ -28,7 +28,7 @@ namespace moar
 
 		[[nodiscard]] constexpr explicit operator bool() const noexcept { return get() != nullptr; }
 
-		[[nodiscard]] constexpr auto operator*() const { return *immutable_ptr; } /* when T is function *T is disallowed; auto returns T* instead of T for *T for functions. */
+		[[nodiscard]] constexpr std::add_lvalue_reference_t<element_type> operator*() const { return *immutable_ptr; } /* when T is function *T is disallowed; auto returns T* instead of T for *T for functions. */
 
 		[[nodiscard]] constexpr auto operator->() const noexcept { return immutable_ptr; }
 
