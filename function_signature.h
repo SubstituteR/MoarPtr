@@ -1,53 +1,5 @@
 #pragma once
-#include <concepts>
-#include <functional>
 #include "moar_ptr.h"
-
-#pragma region Definitions
-
-#if defined(__GNUC__) || defined(__clang__)
-#define CC_CDECL __attribute__((cdecl))
-#define CC_STDCALL __attribute__((stdcall))
-#define CC_THISCALL __attribute__((thiscall))
-#define CC_FASTCALL __attribute__((fastcall))
-#define CC_VECTORCALL __attribute__((vectorcall))
-#if defined(__INTEL_COMPILER)
-#define CC_REGCALL __attribute__((regcall))
-#else
-#define CC_REGCALL CC_CDECL
-#endif
-#elif defined(_MSC_VER) || defined(__INTEL_COMPILER)
-#define CC_CDECL __cdecl
-#define CC_STDCALL __stdcall
-#define CC_THISCALL __fastcall // temporary compiler fix for https://github.com/SubstituteR/MoarPtr/issues/4
-#define CC_FASTCALL __fastcall
-#define CC_VECTORCALL __vectorcall
-#if defined(__INTEL_COMPILER)
-#define CC_REGCALL __regcall
-#else
-#define CC_REGCALL CC_CDECL
-#endif
-#else
-#define CC_CDECL
-#define CC_STDCALL
-#define CC_THISCALL
-#define CC_FASTCALL
-#define CC_VECTORCALL
-#define CC_REGCALL
-#endif
-
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wignored-attributes"
-#endif
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wattributes"
-#endif
-
-#pragma endregion
-
 
 namespace moar
 {
@@ -83,26 +35,13 @@ namespace moar
 
 	template<concepts::Function T1, concepts::CallingConvention T2, concepts::Variadic T3>
 	using function_signature_t = typename function_signature<T1, T2, T3>::type;
+
+	template<concepts::Function T1, concepts::CallingConvention T2, concepts::Variadic T3>
+	struct is_calling_convention_active : std::false_type {};
+
+	template<typename RT, concepts::CallingConvention T2, concepts::Variadic T3, typename ...A>
+	struct is_calling_convention_active<RT(A...), T2, T3> : std::negation<std::is_same<function_signature_t<RT(A...), T2, T3>, function_signature_t<RT(A...), types::cdecl_t, T3>>> {};
+
+	template<concepts::Function T1, concepts::CallingConvention T2, concepts::Variadic T3>
+	constexpr bool is_calling_convention_active_v = is_calling_convention_active<T1, T2, T3>::value;
 }
-
-
-#pragma region Undefinitions
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#endif
-
-#undef CC_CDECL
-#undef CC_STDCALL
-#undef CC_THISCALL
-#undef CC_FASTCALL
-#undef CC_VECTORCALL
-#undef CC_REGCALL
-#undef FUNCTION_SIGNATURE
-#undef FUNCTION_SIGNATURE_VA
-
-#pragma endregion

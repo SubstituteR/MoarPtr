@@ -9,6 +9,7 @@ namespace moar
 	class extern_ptr
 	{
 	public:
+		virtual ~extern_ptr() = default;
 
 		using element_type = std::remove_extent_t<T>;
 		using pointer_type = std::add_pointer_t<T>;
@@ -37,7 +38,7 @@ namespace moar
 
 		explicit extern_ptr(void* address) { immutable_ptr = reinterpret_cast<pointer_type>(address); }
 
-		extern_ptr() : extern_ptr(nullptr) {};
+		extern_ptr() : extern_ptr(nullptr) {}
 
 	protected:
 		pointer_type immutable_ptr;
@@ -64,7 +65,7 @@ namespace moar
 /* Implementation of std::hash (injected into STD.)
 */
 template<typename T>
-struct std::hash<moar::extern_ptr<T>>
+struct std::hash<moar::extern_ptr<T>>  // NOLINT(cert-dcl58-cpp)
 {
 	[[nodiscard]] constexpr auto operator()(moar::extern_ptr<T> const& p) const noexcept { return std::hash<std::add_pointer_t<T>>{}(p.get()); }
 };
