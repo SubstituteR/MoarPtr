@@ -12,20 +12,20 @@ namespace moar
 	class function_ptr {};
 
 	template<typename RT, concepts::CommonType T2, concepts::CommonType T3, typename ...A>
-	class function_ptr<RT(A...), T2, T3> : public extern_ptr<function_signature_t<RT(A...), type_traits::select_calling_convention_t<T2,T3>, type_traits::select_variadic_t<T2, T3>>> /* typename not declared yet. */
+	class function_ptr<RT(A...), T2, T3>  : public extern_ptr<function_signature_t<RT(A...), type_traits::select_calling_convention_t<T2,T3>, type_traits::select_variadic_t<T2, T3>>> /* typename not declared yet. */
 	{
 	public:
 		/// <summary>
 		/// Set the internal pointers to a raw address
 		/// </summary>
 		/// <param name="new_ptr">The address to set the immutable and mutable pointers to.</param>
-		constexpr void reset(void* new_ptr = nullptr) noexcept { base::reset(reinterpret_cast<base::element_type*>(new_ptr)); }
+		constexpr void reset(void* new_ptr = nullptr) noexcept { base::reset(std::bit_cast<base::pointer_type>(new_ptr)); }
 
 		/// <summary>
 		/// Construct a function_pointer by raw address.
 		/// </summary>
 		/// <param name="address">The address to set the immutable and mutable pointers to.</param>
-		explicit function_ptr(void* address) : base(address) { mutable_ptr = reinterpret_cast<base::element_type*>(address); }
+		explicit function_ptr(void* address) : base(address) { mutable_ptr = std::bit_cast<base::pointer_type>(address); }
 
 		/// <summary>
 		/// Construct a function_pointer by module name and relative virtual address.
@@ -38,8 +38,8 @@ namespace moar
 		/// <summary>
 		/// Construct a function_pointer by object reference and virtual function table index.
 		/// </summary>
-		/// <param name="object">An instance of an object with virutal functions to resolve by index.</param>
-		/// <param name="vfti">The virtual function table index to resovle on the object instance.</param>
+		/// <param name="object">An instance of an object with virtual functions to resolve by index.</param>
+		/// <param name="vfti">The virtual function table index to resolve on the object instance.</param>
 		function_ptr(void* object, int vfti) : function_ptr(from_virtual(object, vfti)) { /*NOP*/ }
 
 		/// <summary>
@@ -48,7 +48,7 @@ namespace moar
 		function_ptr() : function_ptr(nullptr) { /*NOP*/ };
 
 		/// <summary>
-		/// Gets a pointer to the mutable poitner for mutating.
+		/// Gets a pointer to the mutable pointer for mutating.
 		/// </summary>
 		/// <returns>Pointer to the mutable pointer.</returns>
 		[[nodiscard]] auto mut() { return reinterpret_cast<void**>(&mutable_ptr); } /* pointer to the mutable pointer, decayed of all type info. */
@@ -62,7 +62,7 @@ namespace moar
 		/// <summary>
 		/// Calls the function at the immutable pointer. This will include any hooks if any are set.
 		/// </summary>
-		/// <param name="...args">The arguments of the function.</param>
+		/// <param name="args">The arguments of the function.</param>
 		/// <returns>The value returned from the function.</returns>
 		RT operator()(A... args) requires std::is_same_v<void, T3> || std::is_same_v<void, T2>
 		{
@@ -73,8 +73,8 @@ namespace moar
 		/// Calls the function at the immutable pointer. This will include any hooks if any are set.
 		/// </summary>
 		/// <typeparam name="...B">The variadic argument types for this call (inferred.)</typeparam>
-		/// <param name="...args">The arguments of the function.</param>
-		/// <param name="...vargs">The variadic arguments of the function.</param>
+		/// <param name="args">The arguments of the function.</param>
+		/// <param name="vargs">The variadic arguments of the function.</param>
 		/// <returns>The value returned from the function.</returns>
 		template<typename ...B>
 		RT operator()(A... args, B... vargs) requires std::is_same_v<types::variadic_t, T3> || std::is_same_v<types::variadic_t, T2>
@@ -85,7 +85,7 @@ namespace moar
 		/// <summary>
 		/// Calls the function at the mutable pointer. This will be the original function if any hooks are set, otherwise it will be the same as the immutable pointer.
 		/// </summary>
-		/// <param name="...args">The arguments of the function.</param>
+		/// <param name="args">The arguments of the function.</param>
 		/// <returns>The value returned from the function.</returns>
 		RT original(A... args) requires std::is_same_v<void, T3>
 		{
@@ -96,8 +96,8 @@ namespace moar
 		/// Calls the function at the mutable pointer. This will be the original function if any hooks are set, otherwise it will be the same as the immutable pointer.
 		/// </summary>
 		/// <typeparam name="...B">The variadic argument types for this call (inferred.)</typeparam>
-		/// <param name="...args">The arguments of the function.</param>
-		/// <param name="...vargs">The variadic arguments of the function.</param>
+		/// <param name="args">The arguments of the function.</param>
+		/// <param name="vargs">The variadic arguments of the function.</param>
 		/// <returns>The value returned from the function.</returns>
 		template<typename ...B>
 		RT original(A... args, B... vargs) requires std::is_same_v<types::variadic_t, T3> || std::is_same_v<types::variadic_t, T2>
@@ -107,13 +107,13 @@ namespace moar
 	private:
 		using base = extern_ptr<function_signature_t<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>>;
 
-		base::element_type* mutable_ptr = nullptr;
+		typename base::pointer_type mutable_ptr = nullptr;
 
-		void reset_internal(base::element_type* new_ptr) override { this->mutable_ptr = new_ptr; }
+		void reset_internal(typename base::pointer_type new_ptr) override { this->mutable_ptr = new_ptr; }
 
 		template <concepts::ModuleName T>
-		static inline auto from_module(T module, int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandle(module)) + rva); }
-		static inline auto from_virtual(void* object, int vfti) -> void* { return (*reinterpret_cast<void***>(object))[vfti]; }
+		static auto from_module(T module, const int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandle(module)) + rva); }
+		static auto from_virtual(void* object, const int vfti) -> void* { return (*std::bit_cast<void***>(object))[vfti]; }
 	};
 
 	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
@@ -124,11 +124,33 @@ namespace moar
 
 	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
 	[[nodiscard]] constexpr auto make_function_ptr(void* object, int vfti) noexcept { return function_ptr<T1, T2, T3>{ object, vfti }; }
+
+	template<typename RT, typename ...A>
+	class function_ptr<RT CC_CDECL(A..., ...)> : public function_ptr<RT(A...), types::cdecl_t, types::variadic_t> {};
+
+	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::stdcall_t, void>
+	class function_ptr<RT CC_STDCALL (A...)> : public function_ptr<RT(A...), types::stdcall_t, void> {};
+
+	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::thiscall_t, void>
+	class function_ptr<RT CC_THISCALL(A...)> : public function_ptr<RT(A...), types::thiscall_t, void> {};
+
+	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::fastcall_t, void>
+	class function_ptr<RT CC_FASTCALL(A...)> : public function_ptr<RT(A...), types::fastcall_t, void> {};
+
+	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::vectorcall_t, void>
+	class function_ptr<RT CC_VECTORCALL(A...)> : public function_ptr<RT(A...), types::vectorcall_t, void> {};
+
+	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::regcall_t, void>
+	class function_ptr<RT CC_REGCALL(A...)> : public function_ptr<RT(A...), types::regcall_t, void> {};
+
+	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::regcall_t, types::variadic_t>
+	class function_ptr<RT CC_REGCALL(A..., ...)> : public function_ptr < RT(A...), types::regcall_t, types::variadic_t > {};
+
 }
 /* Implementation of std::hash (injected into STD.)
 */
 template<typename T>
-struct std::hash<moar::function_ptr<T>>
+struct std::hash<moar::function_ptr<T>>  // NOLINT(cert-dcl58-cpp)
 {
 	std::size_t operator()(moar::function_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
 };
