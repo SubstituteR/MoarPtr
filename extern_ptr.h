@@ -42,8 +42,8 @@ namespace moar
 			constexpr typename base::pointer_type internal_release() noexcept { auto rt = base::get(); internal_reset(); return rt; }
 			constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept { this->immutable_ptr_ = new_ptr; }
 		public:
-			explicit extern_ptr(void* address) { this->immutable_ptr_ = reinterpret_cast<typename base::pointer_type>(address); }
 
+			explicit extern_ptr(base::pointer_type address) { this->reset(address); }
 			extern_ptr() : extern_ptr(nullptr) {}
 		};
 
