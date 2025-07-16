@@ -97,7 +97,13 @@ namespace moar
 			}
 		protected:
 			function_ptr_base() = default;
+			function_ptr_base(typename base::pointer_type pointer)
+			{
+				this->reset(pointer);
+			}
+
 		public:
+
 			explicit operator extern_ptr<typename base::element_type>() const
 			{
 				return v4::make_extern<typename base::element_type>(this->immutable_ptr_);
@@ -117,13 +123,13 @@ namespace moar
 		/// Set the internal pointers to a raw address
 		/// </summary>
 		/// <param name="new_ptr">The address to set the immutable and mutable pointers to.</param>
-		constexpr void reset(void* new_ptr = nullptr) noexcept { base::reset(std::bit_cast<base::pointer_type>(new_ptr)); }
+		constexpr void reset(void* new_ptr = nullptr) noexcept { base::reset(reinterpret_cast<base::pointer_type>(new_ptr)); }
 
 		/// <summary>
 		/// Construct a function_pointer by raw address.
 		/// </summary>
 		/// <param name="address">The address to set the immutable and mutable pointers to.</param>
-		explicit function_ptr(void* address) : base(address) { mutable_ptr = std::bit_cast<base::pointer_type>(address); }
+		explicit function_ptr(void* address) : base(address) { mutable_ptr = reinterpret_cast<base::pointer_type>(address); }
 
 		/// <summary>
 		/// Construct a function_pointer by module name and relative virtual address.
@@ -211,7 +217,7 @@ namespace moar
 
 		template <concepts::ModuleName T>
 		static auto from_module(T module, const int rva) -> void* { return reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(GetModuleHandle(module)) + rva); }
-		static auto from_virtual(void* object, const int vfti) -> void* { return (*std::bit_cast<void***>(object))[vfti]; }
+		static auto from_virtual(void* object, const int vfti) -> void* { return (*reinterpret_cast<void***>(object))[vfti]; }
 	};
 
 	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
