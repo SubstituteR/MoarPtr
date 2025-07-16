@@ -13,7 +13,10 @@ namespace moar
 			using element_type = std::remove_extent_t<T>;
 			using pointer_type = std::add_pointer_t<element_type>;
 			pointer_type immutable_ptr_;
+
+		private:
 			pointer_base() = default;
+
 		public:
 
 			[[nodiscard]] constexpr auto get() const noexcept { return immutable_ptr_; }
@@ -32,6 +35,8 @@ namespace moar
 			{
 				static_cast<C*>(this)->internal_reset(new_ptr);
 			}
+
+			friend C;
 		};
 
 		template<typename T>
@@ -43,13 +48,15 @@ namespace moar
 			constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept { this->immutable_ptr_ = new_ptr; }
 		public:
 
-			explicit extern_ptr(base::pointer_type address) { this->reset(address); }
+			explicit extern_ptr(typename base::pointer_type address) { this->reset(address); }
 			extern_ptr() : extern_ptr(nullptr) {}
 		};
 
 		template <typename T>
 		[[nodiscard]] constexpr auto make_extern(std::add_pointer_t<T> pointer) noexcept { return extern_ptr<T>(pointer); }
 
+		template<typename T>
+		extern_ptr(T)-> extern_ptr<std::remove_pointer_t<T>>;
 
 	}
 	
