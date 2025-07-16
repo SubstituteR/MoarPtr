@@ -52,6 +52,7 @@
 #include "extern_ptr.h"
 #include "function_signature.h"
 #include "function_ptr_base.h"
+#include "function_ptr.h"
 
 #pragma region Undefinitions
 
