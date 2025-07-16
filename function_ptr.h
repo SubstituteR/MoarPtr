@@ -93,6 +93,12 @@ namespace moar::v4
 
 	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::regcall_t, types::variadic_t>
 	function_ptr(RT CC_REGCALL (A..., ...)) -> function_ptr<RT(A...), types::regcall_t, types::variadic_t>;
-
-
 }
+
+/* Implementation of std::hash (injected into STD.)
+*/
+template<typename T>
+struct std::hash<moar::v4::function_ptr<T>>  // NOLINT(cert-dcl58-cpp)
+{
+	std::size_t operator()(moar::v4::function_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
+};
