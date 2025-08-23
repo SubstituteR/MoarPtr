@@ -96,11 +96,13 @@ namespace moar
 				this->immutable_ptr_ = new_ptr;
 			}
 		protected:
-			function_ptr_base() = default;
-			function_ptr_base(typename base::pointer_type pointer)
+
+			explicit function_ptr_base(typename base::pointer_type pointer)
 			{
 				this->reset(pointer);
 			}
+
+			function_ptr_base() : function_ptr_base(nullptr) {}
 
 		public:
 
