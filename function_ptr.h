@@ -70,6 +70,14 @@ namespace moar::v4
 	class function_ptr<RT CC_REGCALL(A..., ...)> : public function_ptr<RT(A...), types::regcall_t, types::variadic_t>
 	{ public: using function_ptr<RT(A...), types::regcall_t, types::variadic_t>::function_ptr; };
 
+    template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::ms_abi_t, void>
+    class function_ptr<RT CC_MS_ABI(A...)> : public function_ptr<RT(A...), types::ms_abi_t, void>
+    { public: using function_ptr<RT(A...), types::ms_abi_t, void>::function_ptr; };
+
+    template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::sysv_abi_t, void>
+    class function_ptr<RT CC_SYSV_ABI(A...)> : public function_ptr<RT(A...), types::sysv_abi_t, void>
+    { public: using function_ptr<RT(A...), types::sysv_abi_t, void>::function_ptr; };
+
 	template<typename RT, typename ...A>
 	function_ptr(RT(A...)) -> function_ptr<RT(A...), types::default_calling_convention, void>;
 
@@ -88,12 +96,19 @@ namespace moar::v4
 	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::regcall_t, void>
 	function_ptr(RT CC_REGCALL(A...)) -> function_ptr<RT(A...), types::regcall_t, void>;
 
+    template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::ms_abi_t, void>
+    function_ptr(RT CC_MS_ABI(A...)) -> function_ptr<RT(A...), types::ms_abi_t, void>;
+
+    template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::sysv_abi_t, void>
+    function_ptr(RT CC_SYSV_ABI(A...)) -> function_ptr<RT(A...), types::sysv_abi_t, void>;
+
 	template<typename RT, typename ...A>
 	function_ptr(RT(A...,...)) -> function_ptr<RT(A...), types::default_calling_convention, types::variadic_t>;
 
 	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::regcall_t, types::variadic_t>
 	function_ptr(RT CC_REGCALL (A..., ...)) -> function_ptr<RT(A...), types::regcall_t, types::variadic_t>;
 }
+
 
 /* Implementation of std::hash (injected into STD.)
 */

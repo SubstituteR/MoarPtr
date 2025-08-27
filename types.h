@@ -16,6 +16,8 @@ namespace moar
 		struct fastcall_t : calling_convention {};
 		struct vectorcall_t : calling_convention {};
 		struct regcall_t : calling_convention {};
+        struct ms_abi_t : calling_convention {};
+        struct sysv_abi_t : calling_convention {};
 
 		using default_variadic = void;
 		using default_calling_convention = cdecl_t;

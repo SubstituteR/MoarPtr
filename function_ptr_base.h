@@ -89,7 +89,7 @@ namespace moar
 				function_ptr_base<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>,
 				function_signature_t<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>
 			>;
-			friend class base;
+			friend base;
 			constexpr typename base::pointer_type internal_release() noexcept { auto rt = base::get(); internal_reset(); return rt; }
 			constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept
 			{
@@ -251,7 +251,6 @@ namespace moar
 
 	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::regcall_t, types::variadic_t>
 	class function_ptr<RT CC_REGCALL(A..., ...)> : public function_ptr < RT(A...), types::regcall_t, types::variadic_t > {};
-
 }
 /* Implementation of std::hash (injected into STD.)
 */
