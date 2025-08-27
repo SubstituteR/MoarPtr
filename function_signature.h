@@ -37,7 +37,13 @@ namespace moar
     struct function_signature<RT(A...), types::ms_abi_t, void> { using type = RT CC_MS_ABI(A...); };
 
     template<typename RT, typename ...A>
+    struct function_signature<RT(A...), types::ms_abi_t, types::variadic_t> { using type = RT CC_MS_ABI(A..., ...); };
+
+    template<typename RT, typename ...A>
     struct function_signature<RT(A...), types::sysv_abi_t, void> { using type = RT CC_SYSV_ABI(A...); };
+
+    template<typename RT, typename ...A>
+    struct function_signature<RT(A...), types::sysv_abi_t, types::variadic_t> { using type = RT CC_MS_ABI(A..., ...); };
 
 	template<concepts::Function T1, concepts::CallingConvention T2, concepts::Variadic T3>
 	using function_signature_t = typename function_signature<T1, T2, T3>::type;
