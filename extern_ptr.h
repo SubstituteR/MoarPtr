@@ -43,7 +43,7 @@ namespace moar
 		class extern_ptr : public pointer_base<extern_ptr<T>, T>
 		{
 			using base = pointer_base<extern_ptr<T>, T>;
-			friend class base;
+			friend base;
 			constexpr typename base::pointer_type internal_release() noexcept { auto rt = base::get(); internal_reset(); return rt; }
 			constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept { this->immutable_ptr_ = new_ptr; }
 		public:
