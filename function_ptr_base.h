@@ -74,10 +74,10 @@ namespace moar
 		class detour_ptr<RT(A..., ...), T2, T3> : public detour_ptr<RT(A...), T2, types::variadic_t> {};
 
 		template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::stdcall_t, void>
-		class detour_ptr<RT CC_STDCALL(A...)> : detour_ptr<RT(A...), types::stdcall_t, void> {};
+		class detour_ptr<RT stdcall_m(A...)> : detour_ptr<RT(A...), types::stdcall_t, void> {};
 
 		template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::fastcall_t, void>
-		class detour_ptr<RT CC_FASTCALL(A...)> : detour_ptr<RT(A...), types::stdcall_t, void> {};
+		class detour_ptr<RT fastcall_m(A...)> : detour_ptr<RT(A...), types::stdcall_t, void> {};
 		*/
 		template<typename RT, concepts::CommonType T2, concepts::CommonType T3, typename ...A>
 		class function_ptr_base<RT(A...), T2, T3> : public pointer_base<
@@ -97,7 +97,7 @@ namespace moar
 			}
 		protected:
 
-			explicit function_ptr_base(typename base::pointer_type pointer)
+			function_ptr_base(typename base::pointer_type pointer)
 			{
 				this->reset(pointer);
 			}
@@ -106,12 +106,25 @@ namespace moar
 
 		public:
 
+            RT operator()(A... args) requires (!concepts::Variadic<T3>)
+            {
+                return this->immutable_ptr_(args...);
+            }
+
+            template<typename ...B>
+            RT operator()(A... args, B... varargs) requires concepts::Variadic<T3>
+            {
+                return this->immutable_ptr_(args..., varargs...);
+            }
+
 			explicit operator extern_ptr<typename base::element_type>() const
 			{
 				return v4::make_extern<typename base::element_type>(this->immutable_ptr_);
 			}
 		};
 	}
+
+
 
 
 	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
@@ -232,25 +245,25 @@ namespace moar
 	[[nodiscard]] constexpr auto make_function_ptr(void* object, int vfti) noexcept { return function_ptr<T1, T2, T3>{ object, vfti }; }
 
 	template<typename RT, typename ...A>
-	class function_ptr<RT CC_CDECL(A..., ...)> : public function_ptr<RT(A...), types::cdecl_t, types::variadic_t> {};
+	class function_ptr<RT cdecl_m(A..., ...)> : public function_ptr<RT(A...), types::cdecl_t, types::variadic_t> {};
 
 	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::stdcall_t, void>
-	class function_ptr<RT CC_STDCALL (A...)> : public function_ptr<RT(A...), types::stdcall_t, void> {};
+	class function_ptr<RT stdcall_m (A...)> : public function_ptr<RT(A...), types::stdcall_t, void> {};
 
 	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::thiscall_t, void>
-	class function_ptr<RT CC_THISCALL(A...)> : public function_ptr<RT(A...), types::thiscall_t, void> {};
+	class function_ptr<RT thiscall_m(A...)> : public function_ptr<RT(A...), types::thiscall_t, void> {};
 
 	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::fastcall_t, void>
-	class function_ptr<RT CC_FASTCALL(A...)> : public function_ptr<RT(A...), types::fastcall_t, void> {};
+	class function_ptr<RT fastcall_m(A...)> : public function_ptr<RT(A...), types::fastcall_t, void> {};
 
 	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::vectorcall_t, void>
-	class function_ptr<RT CC_VECTORCALL(A...)> : public function_ptr<RT(A...), types::vectorcall_t, void> {};
+	class function_ptr<RT vectorcall_m(A...)> : public function_ptr<RT(A...), types::vectorcall_t, void> {};
 
 	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::regcall_t, void>
-	class function_ptr<RT CC_REGCALL(A...)> : public function_ptr<RT(A...), types::regcall_t, void> {};
+	class function_ptr<RT regcall_m(A...)> : public function_ptr<RT(A...), types::regcall_t, void> {};
 
 	template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::regcall_t, types::variadic_t>
-	class function_ptr<RT CC_REGCALL(A..., ...)> : public function_ptr < RT(A...), types::regcall_t, types::variadic_t > {};
+	class function_ptr<RT regcall_m(A..., ...)> : public function_ptr < RT(A...), types::regcall_t, types::variadic_t > {};
 }
 /* Implementation of std::hash (injected into STD.)
 */

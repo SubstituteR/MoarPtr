@@ -3,40 +3,40 @@
 #pragma region Definitions
 
 #if defined(__GNUC__) || defined(__clang__)
-#define CC_CDECL __attribute__((cdecl))
-#define CC_STDCALL __attribute__((stdcall))
-#define CC_THISCALL __attribute__((thiscall))
-#define CC_FASTCALL __attribute__((fastcall))
-#define CC_VECTORCALL __attribute__((vectorcall))
-#define CC_MS_ABI __attribute__((ms_abi))
-#define CC_SYSV_ABI __attribute__((sysv_abi))
+#define cdecl_m __attribute__((cdecl))
+#define stdcall_m __attribute__((stdcall))
+#define thiscall_m __attribute__((thiscall))
+#define fastcall_m __attribute__((fastcall))
+#define vectorcall_m __attribute__((vectorcall))
+#define ms_abi_m __attribute__((ms_abi))
+#define sysv_abi_m __attribute__((sysv_abi))
 #if defined(__INTEL_COMPILER)
-#define CC_REGCALL __attribute__((regcall))
+#define regcall_m __attribute__((regcall))
 #else
-#define CC_REGCALL CC_CDECL
+#define regcall_m cdecl_m
 #endif
 #elif defined(_MSC_VER) || defined(__INTEL_COMPILER)
-#define CC_CDECL __cdecl
-#define CC_STDCALL __stdcall
-#define CC_THISCALL __fastcall // temporary compiler fix for https://github.com/SubstituteR/MoarPtr/issues/4
-#define CC_FASTCALL __fastcall
-#define CC_VECTORCALL __vectorcall
-#define CC_MS_ABI CC_CDECL
-#define CC_SYSV_ABI CC_CDECL
+#define cdecl_m __cdecl
+#define stdcall_m __stdcall
+#define thiscall_m __fastcall // temporary compiler fix for https://github.com/SubstituteR/MoarPtr/issues/4
+#define fastcall_m __fastcall
+#define vectorcall_m __vectorcall
+#define ms_abi_m cdecl_m
+#define sysv_abi_m cdecl_m
 #if defined(__INTEL_COMPILER)
-#define CC_REGCALL __regcall
+#define regcall_m __regcall
 #else
-#define CC_REGCALL CC_CDECL
+#define regcall_m cdecl_m
 #endif
 #else
-#define CC_CDECL
-#define CC_STDCALL
-#define CC_THISCALL
-#define CC_FASTCALL
-#define CC_VECTORCALL
-#define CC_REGCALL
-#define CC_MS_ABI
-#define CC_SYSV_ABI
+#define cdecl_m
+#define stdcall_m
+#define thiscall_m
+#define fastcall_m
+#define vectorcall_m
+#define regcall_m
+#define ms_abi_m
+#define sysv_abi_m
 #endif
 
 #if defined(__clang__)
@@ -70,13 +70,16 @@
 #pragma clang diagnostic pop
 #endif
 
-#undef CC_CDECL
-#undef CC_STDCALL
-#undef CC_THISCALL
-#undef CC_FASTCALL
-#undef CC_VECTORCALL
-#undef CC_REGCALL
-#undef CC_MS_ABI
-#undef CC_SYSV_ABI
+#if defined MOAR_NO_MACRO
 
+#undef cdecl_m
+#undef stdcall_m
+#undef thiscall_m
+#undef fastcall_m
+#undef vectorcall_m
+#undef regcall_m
+#undef ms_abi_m
+#undef sysv_abi_m
+
+#endif
 #pragma endregion
