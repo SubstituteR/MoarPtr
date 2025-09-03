@@ -23,3 +23,5 @@ namespace moar
 		using default_calling_convention = cdecl_t;
 	}
 }
+		struct ms_abi_t : calling_convention {};
+		struct sysv_abi_t : calling_convention {};
