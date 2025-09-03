@@ -6,12 +6,12 @@
 
 namespace moar::v4
 {
-	template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
-	class function_ptr;
+    template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
+    class function_ptr;
 
-	//template<typename RT, concepts::CommonType T2, concepts::CommonType T3, typename ...A>
-	//class function_ptr<RT(A...), T2, T3> : public function_ptr_base<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>
-	//{ public: using function_ptr_base<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>::function_ptr_base; };
+    //template<typename RT, concepts::CommonType T2, concepts::CommonType T3, typename ...A>
+    //class function_ptr<RT(A...), T2, T3> : public function_ptr_base<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>
+    //{ public: using function_ptr_base<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>::function_ptr_base; };
 
     //template<typename RT, typename ...A>
     //class function_ptr<RT (A...)> : public function_ptr_base<RT(A...), types::cdecl_t, void>
@@ -68,5 +68,5 @@ namespace moar::v4
 template<typename T>
 struct std::hash<moar::v4::function_ptr<T>>  // NOLINT(cert-dcl58-cpp)
 {
-	std::size_t operator()(moar::v4::function_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
+    std::size_t operator()(moar::v4::function_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
 };
