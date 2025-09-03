@@ -4,7 +4,7 @@
 #include <functional>
 #include "moar_ptr.h"
 
-namespace moar::v4
+namespace moar
 {
     template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
     class function_ptr;
@@ -66,7 +66,7 @@ namespace moar::v4
 /* Implementation of std::hash (injected into STD.)
 */
 template<typename T>
-struct std::hash<moar::v4::function_ptr<T>>  // NOLINT(cert-dcl58-cpp)
+struct std::hash<moar::function_ptr<T>>  // NOLINT(cert-dcl58-cpp)
 {
-    std::size_t operator()(moar::v4::function_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
+    std::size_t operator()(moar::function_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
 };
