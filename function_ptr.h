@@ -6,17 +6,8 @@
 
 namespace moar
 {
-    template<concepts::Function T1, concepts::CommonType T2 = types::default_calling_convention, concepts::CommonType T3 = type_traits::select_default_t3_t<T2>>
+    template<concepts::Function T1, concepts::CallingConvention T2 = types::default_calling_convention, concepts::Variadic T3 = types::default_variadic>
     class function_ptr;
-
-    //template<typename RT, concepts::CommonType T2, concepts::CommonType T3, typename ...A>
-    //class function_ptr<RT(A...), T2, T3> : public function_ptr_base<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>
-    //{ public: using function_ptr_base<RT(A...), type_traits::select_calling_convention_t<T2, T3>, type_traits::select_variadic_t<T2, T3>>::function_ptr_base; };
-
-    //template<typename RT, typename ...A>
-    //class function_ptr<RT (A...)> : public function_ptr_base<RT(A...), types::cdecl_t, void>
-    //{ public: using function_ptr_base<RT(A...), types::cdecl_t, void>::function_ptr_base; };
-
 
 
 #define function_pointer_impl(convention) \

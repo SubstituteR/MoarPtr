@@ -13,7 +13,7 @@
 #if defined(__INTEL_COMPILER)
 #define regcall_m __attribute__((regcall))
 #else
-#define regcall_m cdecl_m
+#define regcall_m
 #endif
 #elif defined(_MSC_VER) || defined(__INTEL_COMPILER)
 #define cdecl_m __cdecl
@@ -21,12 +21,12 @@
 #define thiscall_m __fastcall // temporary compiler fix for https://github.com/SubstituteR/MoarPtr/issues/4
 #define fastcall_m __fastcall
 #define vectorcall_m __vectorcall
-#define ms_abi_m cdecl_m
-#define sysv_abi_m cdecl_m
+#define ms_abi_m
+#define sysv_abi_m
 #if defined(__INTEL_COMPILER)
 #define regcall_m __regcall
 #else
-#define regcall_m cdecl_m
+#define regcall_m
 #endif
 #else
 #define cdecl_m
@@ -54,7 +54,7 @@
 #include "types.h"
 #include "concepts.h"
 #include "type_traits.h"
-
+#include "pointer_base.h"
 #include "extern_ptr.h"
 #include "function_signature.h"
 #include "function_ptr_base.h"
