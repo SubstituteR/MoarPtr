@@ -59,7 +59,8 @@
 #include "function_signature.h"
 #include "function_ptr_base.h"
 #include "function_ptr.h"
-
+#include "trampoline_ptr_base.h"
+#include "trampoline_ptr.h"
 #pragma region Undefinitions
 
 #if defined(__GNUC__)
