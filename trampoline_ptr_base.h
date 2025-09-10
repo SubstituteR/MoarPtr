@@ -34,6 +34,8 @@ namespace moar
 
     public:
 
+        [[nodiscard]] constexpr std::add_lvalue_reference_t<typename base::pointer_type> mut() noexcept { return mutable_ptr_; }
+
         RT operator()(A... args) requires (!concepts::Variadic<T3>)
         {
             return this->immutable_ptr_(args...);
