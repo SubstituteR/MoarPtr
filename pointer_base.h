@@ -26,11 +26,13 @@ namespace moar
 
         [[nodiscard]] constexpr explicit operator auto () const noexcept { return get(); }
 
-        [[maybe_unused]] constexpr pointer_type release() noexcept { return static_cast<C*>(this)->internal_release(); }
+        template<class Self>
+        [[maybe_unused]] constexpr pointer_type release(this Self&& self) noexcept { return self.internal_release(); }
 
-        constexpr void reset(pointer_type new_ptr = nullptr) noexcept
+        template<class Self>
+        constexpr void reset(this Self&& self, pointer_type new_ptr = nullptr) noexcept
         {
-            static_cast<C*>(this)->internal_reset(new_ptr);
+            self.internal_reset(new_ptr);
         }
 
         friend C;
