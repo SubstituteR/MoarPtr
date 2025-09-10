@@ -26,6 +26,7 @@ namespace moar
 
         [[nodiscard]] constexpr explicit operator auto () const noexcept { return get(); }
 
+#if __cplusplus  >= 202302L
         template<class Self>
         [[maybe_unused]] constexpr pointer_type release(this Self&& self) noexcept { return self.internal_release(); }
 
@@ -34,6 +35,13 @@ namespace moar
         {
             self.internal_reset(new_ptr);
         }
+#else
+        [[maybe_unused]] constexpr pointer_type release() noexcept { return static_cast<C*>(this)->internal_release(); }
+        constexpr void reset(pointer_type new_ptr = nullptr) noexcept
+        {
+            static_cast<C*>(this)->internal_reset(new_ptr);
+        }
+#endif
 
         friend C;
     };
