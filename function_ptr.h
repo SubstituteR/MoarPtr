@@ -16,8 +16,11 @@ namespace moar
     {                                     \
     using base = function_ptr_base<RT(A...), types::convention##_t, void>; \
     public: \
-        function_ptr() : base() {};                                  \
-        function_ptr(typename base::pointer_type pointer) : base(pointer) {}; \
+        function_ptr() : base() {}; \
+        explicit function_ptr(base::pointer_type pointer) : base(pointer) {}; \
+        explicit function_ptr(nullptr_t pointer) : function_ptr(reinterpret_cast<base::pointer_type>(pointer)) {} \
+        explicit function_ptr(void* pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
+        explicit function_ptr(std::size_t pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
     };                                    \
     template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, void> \
     function_ptr(RT convention##_m(A...)) -> function_ptr<RT convention##_m (A...)>;
@@ -28,8 +31,11 @@ namespace moar
     {                                     \
     using base = function_ptr_base<RT(A...), types::convention##_t, types::variadic_t>; \
     public: \
-        function_ptr() : base() {};                                  \
-        function_ptr(typename base::pointer_type pointer) : base(pointer) {}; \
+        function_ptr() : base() {}; \
+        explicit function_ptr(base::pointer_type pointer) : base(pointer) {}; \
+        explicit function_ptr(nullptr_t pointer) : function_ptr(reinterpret_cast<base::pointer_type>(pointer)) {} \
+        explicit function_ptr(void* pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
+        explicit function_ptr(std::size_t pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
     };                                    \
     template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, types::variadic_t> \
     function_ptr(RT convention##_m(A...,...)) -> function_ptr<RT convention##_m (A...,...)>;

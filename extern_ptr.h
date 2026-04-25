@@ -11,8 +11,11 @@ namespace moar
         constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept { this->immutable_ptr_ = new_ptr; }
     public:
 
-        explicit extern_ptr(typename base::pointer_type address) { this->reset(address); }
         extern_ptr() : extern_ptr(nullptr) {}
+        explicit extern_ptr(base::pointer_type pointer) { this->reset(pointer); }
+        explicit extern_ptr(nullptr_t pointer) : extern_ptr(reinterpret_cast<base::pointer_type>(pointer)) {}
+        explicit extern_ptr(void* pointer) : extern_ptr(reinterpret_cast<base::pointer_type>(pointer)) {}
+        explicit extern_ptr(std::size_t pointer) : extern_ptr(reinterpret_cast<base::pointer_type>(pointer)) {}
     };
 
     template <typename T>
