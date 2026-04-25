@@ -37,11 +37,16 @@ namespace moar
         }
 #else
         [[maybe_unused]] constexpr pointer_type release() noexcept { return static_cast<C*>(this)->internal_release(); }
-        constexpr void reset(pointer_type new_ptr = nullptr) noexcept
+        constexpr void reset(pointer_type new_ptr) noexcept
         {
             static_cast<C*>(this)->internal_reset(new_ptr);
         }
 #endif
+
+        constexpr void reset() noexcept { this->reset(nullptr); }
+        constexpr void reset(nullptr_t new_ptr) noexcept { this->reset(reinterpret_cast<pointer_type>(new_ptr)); }
+        constexpr void reset(void* new_ptr) noexcept { this->reset(reinterpret_cast<pointer_type>(new_ptr)); }
+        constexpr void reset(std::size_t new_ptr) noexcept { this->reset(reinterpret_cast<pointer_type>(new_ptr)); }
 
         friend C;
     };
