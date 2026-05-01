@@ -12,10 +12,12 @@ namespace moar
     public:
 
         extern_ptr() : extern_ptr(nullptr) {}
+        // ReSharper disable CppNonExplicitConvertingConstructor
+        extern_ptr(std::size_t pointer) : extern_ptr(reinterpret_cast<base::pointer_type>(pointer)) {}
+        // ReSharper restore CppNonExplicitConvertingConstructor
         explicit extern_ptr(base::pointer_type pointer) { this->reset(pointer); }
         explicit extern_ptr(nullptr_t pointer) : extern_ptr(reinterpret_cast<base::pointer_type>(pointer)) {}
         explicit extern_ptr(void* pointer) : extern_ptr(reinterpret_cast<base::pointer_type>(pointer)) {}
-        explicit extern_ptr(std::size_t pointer) : extern_ptr(reinterpret_cast<base::pointer_type>(pointer)) {}
     };
 
     template <typename T>

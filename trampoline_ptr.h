@@ -17,10 +17,10 @@ namespace moar
     using base = trampoline_ptr_base<RT(A...), types::convention##_t, void>; \
     public: \
         trampoline_ptr() : base() {}; \
+        trampoline_ptr(std::size_t pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
         explicit trampoline_ptr(base::pointer_type pointer) : base(pointer) {}; \
         explicit trampoline_ptr(nullptr_t pointer) : trampoline_ptr(reinterpret_cast<base::pointer_type>(pointer)) {} \
         explicit trampoline_ptr(void* pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
-        explicit trampoline_ptr(std::size_t pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
     };                                    \
     template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, void> \
     trampoline_ptr(RT convention##_m(A...)) -> trampoline_ptr<RT convention##_m (A...)>;
@@ -32,10 +32,10 @@ namespace moar
     using base = trampoline_ptr_base<RT(A...), types::convention##_t, types::variadic_t>; \
     public: \
         trampoline_ptr() : base() {}; \
+        trampoline_ptr(std::size_t pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
         explicit trampoline_ptr(base::pointer_type pointer) : base(pointer) {}; \
         explicit trampoline_ptr(nullptr_t pointer) : trampoline_ptr(reinterpret_cast<base::pointer_type>(pointer)) {} \
         explicit trampoline_ptr(void* pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
-        explicit trampoline_ptr(std::size_t pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
     };                                    \
     template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, types::variadic_t> \
     trampoline_ptr(RT convention##_m(A...,...)) -> trampoline_ptr<RT convention##_m (A...,...)>;
