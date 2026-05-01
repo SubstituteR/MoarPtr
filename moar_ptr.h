@@ -53,7 +53,6 @@
 
 #include "types.h"
 #include "concepts.h"
-#include "type_traits.h"
 #include "pointer_base.h"
 #include "extern_ptr.h"
 #include "function_signature.h"
