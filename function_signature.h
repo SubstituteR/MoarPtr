@@ -46,7 +46,7 @@ namespace moar
     struct function_signature<RT(A...), types::sysv_abi_t, types::variadic_t> { using type = RT sysv_abi_m (A..., ...); };
 
     template<concepts::Function T1, concepts::CallingConvention T2, concepts::Variadic T3>
-    using function_signature_t = typename function_signature<T1, T2, T3>::type;
+    using function_signature_t = function_signature<T1, T2, T3>::type;
 
     template<concepts::Function T1, concepts::CallingConvention T2, concepts::Variadic T3>
     struct is_calling_convention_active;
