@@ -30,13 +30,13 @@ namespace moar
 
     public:
 
-        RT operator()(A... args) requires (!concepts::Variadic<T3>)
+        RT operator()(A... args) requires std::is_same_v<T3, void>
         {
             return this->immutable_ptr_(args...);
         }
 
         template<typename ...B>
-        RT operator()(A... args, B... varargs) requires concepts::Variadic<T3>
+        RT operator()(A... args, B... varargs) requires std::is_same_v<T3, types::variadic_t>
         {
             return this->immutable_ptr_(args..., varargs...);
         }
