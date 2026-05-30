@@ -3,12 +3,15 @@
 namespace moar
 {
     template<typename T>
-    class extern_ptr : public pointer_base<extern_ptr<T>, T>
+    class extern_ptr : public pointer_base<T>
     {
-        using base = pointer_base<extern_ptr, T>;
+        using base = pointer_base<T>;
         friend base;
         constexpr typename base::pointer_type internal_release() noexcept { auto rt = base::get(); internal_reset(); return rt; }
-        constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept { this->immutable_ptr_ = new_ptr; }
+        constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept
+        {
+            this->immutable_ptr_ = new_ptr;
+        }
     public:
 
         extern_ptr() : extern_ptr(nullptr) {}

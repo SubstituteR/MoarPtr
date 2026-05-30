@@ -10,9 +10,9 @@ namespace moar
     class trampoline_ptr_base;
 
     template<typename RT, concepts::CallingConvention T2, concepts::Variadic T3, typename ...A>
-    class trampoline_ptr_base<RT(A...), T2, T3> : public pointer_base<trampoline_ptr_base<RT(A...), T2, T3>, function_signature_t<RT(A...), T2, T3>> /* typename not declared yet. */
+    class trampoline_ptr_base<RT(A...), T2, T3> : public pointer_base<function_signature_t<RT(A...), T2, T3>> /* typename not declared yet. */
     {
-        using base = pointer_base<trampoline_ptr_base, function_signature_t<RT(A...), T2, T3>>;        
+        using base = pointer_base<function_signature_t<RT(A...), T2, T3>>;        
         base::pointer_type mutable_ptr_;
         friend base;
 

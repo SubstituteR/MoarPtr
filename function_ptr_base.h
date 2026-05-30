@@ -11,9 +11,9 @@ namespace moar
     class function_ptr_base;
 
     template<typename RT, concepts::CallingConvention T2, concepts::Variadic T3, typename ...A>
-    class function_ptr_base<RT(A...), T2, T3> : public pointer_base<function_ptr_base<RT(A...), T2, T3>, function_signature_t<RT(A...), T2, T3>> /* typename not declared yet. */
+    class function_ptr_base<RT(A...), T2, T3> : public pointer_base<function_signature_t<RT(A...), T2, T3>> /* typename not declared yet. */
     {
-        using base = pointer_base<function_ptr_base, function_signature_t<RT(A...), T2, T3>>;
+        using base = pointer_base<function_signature_t<RT(A...), T2, T3>>;
         friend base;
         constexpr typename base::pointer_type internal_release() noexcept { auto rt = base::get(); internal_reset(); return rt; }
         constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept
