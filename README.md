@@ -7,7 +7,7 @@ MoarPtr is a header-only library that adds `observer_ptr` (named `extern_ptr`) a
 Additionally, helper types are added, such as `function_signature` and common calling conventions `convention_t`.
 
 ## Requirements
-C++20
+C++23
 
 ## Supported Operating Systems
 Windows
