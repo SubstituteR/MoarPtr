@@ -17,7 +17,7 @@ namespace moar
     using base = trampoline_ptr_base<RT(A...), types::convention##_t, std::conditional_t<false __VA_OPT__( | true), types::variadic_t, void>>; \
     public: \
         trampoline_ptr() : base() {}; \
-        trampoline_ptr(std::size_t pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
+		explicit trampoline_ptr(concepts::Address auto pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
         explicit trampoline_ptr(base::pointer_type pointer) : base(pointer) {}; \
         explicit trampoline_ptr(nullptr_t pointer) : trampoline_ptr(reinterpret_cast<base::pointer_type>(pointer)) {} \
         explicit trampoline_ptr(void* pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
