@@ -29,10 +29,3 @@ namespace moar
     template<typename T>
     extern_ptr(T)-> extern_ptr<std::remove_pointer_t<T>>;
 }
-/* Implementation of std::hash (injected into STD.)
-*/
-template<typename T>
-struct std::hash<moar::extern_ptr<T>>  // NOLINT(cert-dcl58-cpp)
-{
-    [[nodiscard]] constexpr auto operator()(moar::extern_ptr<T> const& p) const noexcept { return std::hash<std::add_pointer_t<T>>{}(p.get()); }
-};

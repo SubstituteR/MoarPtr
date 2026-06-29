@@ -58,12 +58,3 @@ namespace moar
 #undef function_pointer_impl
 
 }
-
-
-/* Implementation of std::hash (injected into STD.)
-*/
-template<typename T>
-struct std::hash<moar::function_ptr<T>>  // NOLINT(cert-dcl58-cpp)
-{
-    std::size_t operator()(moar::function_ptr<T> const& p) const noexcept { return std::hash<T*>{}(p.get()); }
-};
