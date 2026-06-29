@@ -10,26 +10,13 @@ namespace moar
     class function_ptr;
 
 
-#define function_pointer_impl(convention) \
-    template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, void> \
-    class function_ptr<RT convention##_m(A...)> final : public function_ptr_base<RT(A...), types::convention##_t, void> \
-    {                                     \
-    using base = function_ptr_base<RT(A...), types::convention##_t, void>; \
-    public: \
-        function_ptr() : base() {}; \
-        function_ptr(std::size_t pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
-        explicit function_ptr(base::pointer_type pointer) : base(pointer) {}; \
-        explicit function_ptr(nullptr_t pointer) : function_ptr(reinterpret_cast<base::pointer_type>(pointer)) {} \
-        explicit function_ptr(void* pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
-    };                                    \
-    template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, void> \
-    function_ptr(RT convention##_m(A...)) -> function_ptr<RT convention##_m (A...)>;
+    
 
-#define function_pointer_va_impl(convention) \
-    template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, types::variadic_t> \
-    class function_ptr<RT convention##_m(A...,...)> final : public function_ptr_base<RT(A...), types::convention##_t, types::variadic_t> \
+#define function_pointer_impl(convention, ...) \
+    template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, std::conditional_t<false __VA_OPT__( | true), types::variadic_t, void>> \
+    class function_ptr<RT convention##_m(A... __VA_OPT__(,__VA_ARGS__))> final : public function_ptr_base<RT(A...), types::convention##_t, std::conditional_t<false __VA_OPT__( | true), types::variadic_t, void>> \
     {                                     \
-    using base = function_ptr_base<RT(A...), types::convention##_t, types::variadic_t>; \
+    using base = function_ptr_base<RT(A...), types::convention##_t, std::conditional_t<false __VA_OPT__( | true), types::variadic_t, void>>; \
     public: \
         function_ptr() : base() {}; \
         function_ptr(std::size_t pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
@@ -37,8 +24,9 @@ namespace moar
         explicit function_ptr(nullptr_t pointer) : function_ptr(reinterpret_cast<base::pointer_type>(pointer)) {} \
         explicit function_ptr(void* pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
     };                                    \
-    template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, types::variadic_t> \
-    function_ptr(RT convention##_m(A...,...)) -> function_ptr<RT convention##_m (A...,...)>;
+    template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A... ), types::convention##_t, std::conditional_t<false __VA_OPT__( | true), types::variadic_t, void>> \
+    function_ptr(RT convention##_m(A... __VA_OPT__(,__VA_ARGS__))) -> function_ptr<RT convention##_m (A... __VA_OPT__(,__VA_ARGS__))>;
+
 
     function_pointer_impl(cdecl);
     function_pointer_impl(stdcall);
@@ -49,12 +37,11 @@ namespace moar
     function_pointer_impl(sysv_abi);
     function_pointer_impl(ms_abi);
 
-    function_pointer_va_impl(cdecl);
-    function_pointer_va_impl(regcall);
-    function_pointer_va_impl(sysv_abi);
-    function_pointer_va_impl(ms_abi);
+    function_pointer_impl(cdecl, ...);
+    function_pointer_impl(regcall, ...);
+    function_pointer_impl(sysv_abi, ...);
+    function_pointer_impl(ms_abi, ...);
 
-#undef function_pointer_va_impl
 #undef function_pointer_impl
 
 }
