@@ -20,6 +20,9 @@ namespace moar
         template<typename T>
         concept Variadic = std::is_same_v<T, types::variadic_t> || std::is_same_v<T, void>;
 
+        template<typename T>
+        concept Address = std::is_integral_v<T> && sizeof(void*) >= sizeof(T);
+
 #ifdef _WIN32
         template<typename T>
         concept ModuleName = std::is_same_v<T, nullptr_t> || std::is_same_v<T, LPCTSTR>;
