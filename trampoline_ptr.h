@@ -23,7 +23,7 @@ namespace moar
         explicit trampoline_ptr(void* pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
     };                                    \
     template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, std::conditional_t<false __VA_OPT__( | true), types::variadic_t, void>> \
-    trampoline_ptr(RT convention##_m(A... __VA_OPT__(,__VA_ARGS__))) -> trampoline_ptr<RT convention##_m (A...)>;
+    trampoline_ptr(RT convention##_m(A... __VA_OPT__(,__VA_ARGS__))) -> trampoline_ptr<RT convention##_m (A... __VA_OPT__(,__VA_ARGS__))>;
 
     trampoline_ptr_impl(cdecl);
     trampoline_ptr_impl(stdcall);
