@@ -7,7 +7,7 @@
 MoarPtr is a C++23 header-only library that adds new idiomatic pointers, geared towards software modification at run time.
 
 ## Requirements
-C++23
+C++23  
 A conforming preprossor (/Zc:preprocessor on MSVC)
 
 ## Supported Operating Systems
