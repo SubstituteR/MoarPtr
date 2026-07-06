@@ -18,7 +18,7 @@ namespace moar
     using base = function_ptr_base<RT(A...), types::convention##_t, std::conditional_t<false __VA_OPT__( | true), types::variadic_t, void>>; \
     public: \
         function_ptr() : base() {}; \
-		explicit function_ptr(concepts::Address auto pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
+		explicit function_ptr(concepts::Address auto pointer) : base(reinterpret_cast<base::pointer_type>(static_cast<std::uintptr_t>(pointer))) {} \
         explicit function_ptr(base::pointer_type pointer) : base(pointer) {}; \
         explicit function_ptr(std::nullptr_t pointer) : function_ptr(reinterpret_cast<base::pointer_type>(pointer)) {} \
         explicit function_ptr(void* pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
