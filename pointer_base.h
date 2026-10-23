@@ -9,8 +9,8 @@ namespace moar
     protected:
         using element_type = std::remove_extent_t<T>;
         using pointer_type = std::add_pointer_t<element_type>;
-        pointer_type immutable_ptr_;
-        pointer_base() = default;
+        mutable pointer_type immutable_ptr_;
+        constexpr pointer_base() = default;
 
     public:
 
@@ -24,17 +24,20 @@ namespace moar
 
         [[nodiscard]] constexpr explicit operator auto () const noexcept { return get(); }
 
-        [[maybe_unused]] constexpr pointer_type release(this auto& self) noexcept { return self.internal_release(); }
-
-        constexpr void reset(this auto& self, pointer_type new_ptr = nullptr) noexcept
+        [[maybe_unused]] constexpr pointer_type release(this auto& self) noexcept
         {
-            self.internal_reset(new_ptr);
+	        return self.internal_release();
         }
 
-        constexpr void reset() noexcept { this->reset(nullptr); }
-        constexpr void reset(nullptr_t new_ptr) noexcept { this->reset(reinterpret_cast<pointer_type>(new_ptr)); }
-        constexpr void reset(void* new_ptr) noexcept { this->reset(reinterpret_cast<pointer_type>(new_ptr)); }
-        constexpr void reset(std::size_t new_ptr) noexcept { this->reset(reinterpret_cast<pointer_type>(new_ptr)); }
+    	constexpr void reset(this auto&& self, concepts::Address auto new_ptr) noexcept
+        {
+            if constexpr (concepts::ConstExprAddress<decltype(new_ptr)>) {
+                self.internal_reset(static_cast<pointer_type>(new_ptr));
+            }
+            else {
+                self.internal_reset(std::bit_cast<pointer_type>(static_cast<std::uintptr_t>(new_ptr)));
+            }
+        }
     };
 }
 

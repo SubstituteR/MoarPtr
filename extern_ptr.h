@@ -7,20 +7,15 @@ namespace moar
     {
         using base = pointer_base<T>;
         friend base;
-        constexpr typename base::pointer_type internal_release() noexcept { auto rt = base::get(); internal_reset(); return rt; }
-        constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept
+        constexpr base::pointer_type internal_release() const noexcept { auto rt = base::get(); internal_reset(); return rt; }
+        constexpr void internal_reset(base::pointer_type new_ptr = nullptr) const noexcept
         {
             this->immutable_ptr_ = new_ptr;
         }
     public:
 
-        extern_ptr() : extern_ptr(nullptr) {}
-        // ReSharper disable CppNonExplicitConvertingConstructor
-        extern_ptr(std::size_t pointer) : extern_ptr(reinterpret_cast<base::pointer_type>(pointer)) {}
-        // ReSharper restore CppNonExplicitConvertingConstructor
-        explicit extern_ptr(base::pointer_type pointer) { this->reset(pointer); }
-        explicit extern_ptr(nullptr_t pointer) : extern_ptr(reinterpret_cast<base::pointer_type>(pointer)) {}
-        explicit extern_ptr(void* pointer) : extern_ptr(reinterpret_cast<base::pointer_type>(pointer)) {}
+        explicit constexpr extern_ptr() noexcept : extern_ptr(nullptr) {}
+        explicit constexpr extern_ptr(concepts::Address auto pointer) noexcept { this->reset(pointer); }
     };
 
     template <typename T>

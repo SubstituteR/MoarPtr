@@ -15,18 +15,18 @@ namespace moar
     {
         using base = pointer_base<function_signature_t<RT(A...), T2, T3>>;
         friend base;
-        constexpr typename base::pointer_type internal_release() noexcept { auto rt = base::get(); internal_reset(); return rt; }
-        constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept
+        constexpr base::pointer_type internal_release() const noexcept { auto rt = base::get(); internal_reset(); return rt; }
+        constexpr void internal_reset(base::pointer_type new_ptr = nullptr) const noexcept
         {
             this->immutable_ptr_ = new_ptr;
         }
     protected:
-        explicit function_ptr_base(typename base::pointer_type pointer)
+        explicit constexpr function_ptr_base(base::pointer_type pointer) noexcept
         {
             this->reset(pointer);
         }
 
-        function_ptr_base() : function_ptr_base(nullptr) {}
+        explicit constexpr function_ptr_base() noexcept : function_ptr_base(nullptr) {}
 
     public:
 

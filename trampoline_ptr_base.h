@@ -13,11 +13,11 @@ namespace moar
     class trampoline_ptr_base<RT(A...), T2, T3> : public pointer_base<function_signature_t<RT(A...), T2, T3>> /* typename not declared yet. */
     {
         using base = pointer_base<function_signature_t<RT(A...), T2, T3>>;        
-        base::pointer_type mutable_ptr_;
+        mutable base::pointer_type mutable_ptr_;
         friend base;
 
-        constexpr typename base::pointer_type internal_release() noexcept { auto rt = base::get(); internal_reset(); return rt; }
-        constexpr void internal_reset(typename base::pointer_type new_ptr = nullptr) noexcept
+        constexpr base::pointer_type internal_release() const noexcept { auto rt = base::get(); internal_reset(); return rt; }
+        constexpr void internal_reset(base::pointer_type new_ptr = nullptr) const noexcept
         {
             this->immutable_ptr_ = new_ptr;
             this->mutable_ptr_ = new_ptr;
@@ -25,12 +25,12 @@ namespace moar
 
         
     protected:
-        explicit trampoline_ptr_base(typename base::pointer_type pointer)
+        explicit trampoline_ptr_base(base::pointer_type pointer) noexcept
         {
             this->reset(pointer);
         }
 
-        trampoline_ptr_base() : trampoline_ptr_base(nullptr) {}
+        trampoline_ptr_base() noexcept : trampoline_ptr_base(nullptr) {}
 
     public:
 

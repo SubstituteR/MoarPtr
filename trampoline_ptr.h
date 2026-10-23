@@ -16,11 +16,8 @@ namespace moar
     {                                     \
     using base = trampoline_ptr_base<RT(A...), types::convention##_t, std::conditional_t<false __VA_OPT__( | true), types::variadic_t, void>>; \
     public: \
-        trampoline_ptr() : base() {}; \
-		explicit trampoline_ptr(concepts::Address auto pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
-        explicit trampoline_ptr(base::pointer_type pointer) : base(pointer) {}; \
-        explicit trampoline_ptr(nullptr_t pointer) : trampoline_ptr(reinterpret_cast<base::pointer_type>(pointer)) {} \
-        explicit trampoline_ptr(void* pointer) : base(reinterpret_cast<base::pointer_type>(pointer)) {} \
+        explicit constexpr trampoline_ptr() noexcept : trampoline_ptr(nullptr) {}; \
+		explicit constexpr trampoline_ptr(concepts::Address auto pointer) noexcept { this->reset(pointer); } \
     };                                    \
     template<typename RT, typename ...A> requires moar::is_calling_convention_active_v<RT(A...), types::convention##_t, std::conditional_t<false __VA_OPT__( | true), types::variadic_t, void>> \
     trampoline_ptr(RT convention##_m(A... __VA_OPT__(,__VA_ARGS__))) -> trampoline_ptr<RT convention##_m (A... __VA_OPT__(,__VA_ARGS__))>;
