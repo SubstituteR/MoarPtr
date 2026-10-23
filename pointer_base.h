@@ -18,18 +18,18 @@ namespace moar
 
         [[nodiscard]] constexpr explicit operator bool() const noexcept { return get() != nullptr; }
 
-        [[nodiscard]] constexpr std::add_lvalue_reference_t<element_type> operator*() const { return *get(); }
+        [[nodiscard]] constexpr std::add_lvalue_reference_t<element_type> operator*() const noexcept { return *get(); }
 
         [[nodiscard]] constexpr auto operator->() const noexcept { return get(); }
 
         [[nodiscard]] constexpr explicit operator auto () const noexcept { return get(); }
 
-        [[maybe_unused]] constexpr pointer_type release(this auto& self) noexcept
+        [[maybe_unused]] constexpr pointer_type release(this auto& self) const noexcept
         {
             return self.internal_release();
         }
 
-    	constexpr void reset(this auto&& self, concepts::Address auto new_ptr) noexcept
+    	constexpr void reset(this auto&& self, concepts::Address auto new_ptr) const noexcept
         {
             if constexpr (std::is_convertible_v<decltype(new_ptr), pointer_type>)
             {
