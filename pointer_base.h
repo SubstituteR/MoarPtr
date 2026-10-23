@@ -26,16 +26,22 @@ namespace moar
 
         [[maybe_unused]] constexpr pointer_type release(this auto& self) noexcept
         {
-	        return self.internal_release();
+            return self.internal_release();
         }
 
     	constexpr void reset(this auto&& self, concepts::Address auto new_ptr) noexcept
         {
-            if constexpr (concepts::ConstExprAddress<decltype(new_ptr)>) {
-                self.internal_reset(static_cast<pointer_type>(new_ptr));
+            if constexpr (std::is_convertible_v<decltype(new_ptr), pointer_type>)
+            {
+                self.internal_reset(new_ptr);
             }
-            else {
+            else if constexpr (std::is_integral_v<decltype(new_ptr)>)
+            {
                 self.internal_reset(std::bit_cast<pointer_type>(static_cast<std::uintptr_t>(new_ptr)));
+            }
+            else
+            {
+                self.internal_reset(reinterpret_cast<pointer_type>(new_ptr));
             }
         }
     };

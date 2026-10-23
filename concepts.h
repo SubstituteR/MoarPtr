@@ -21,11 +21,7 @@ namespace moar
         concept Variadic = std::is_same_v<T, types::variadic_t> || std::is_same_v<T, void>;
 
         template<typename T>
-        concept ConstExprAddress = std::is_pointer_v<T> || std::is_null_pointer_v<T>;
-
-        template<typename T>
-        concept Address = ConstExprAddress<T> || (std::is_integral_v<T> && sizeof(void*) >= sizeof(T));
-
+        concept Address = std::is_pointer_v<T> || std::is_null_pointer_v<T> || (std::is_integral_v<T> && sizeof(void*) >= sizeof(T));
 
 
 #ifdef _WIN32
