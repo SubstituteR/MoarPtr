@@ -36,26 +36,26 @@ namespace moar
 
         [[nodiscard]] constexpr std::add_lvalue_reference_t<typename base::pointer_type> mut() const noexcept { return mutable_ptr_; }
 
-        RT operator()(A... args) const noexcept requires std::is_same_v<T3, void>
+        RT operator()(A&&... args) const noexcept requires std::is_same_v<T3, void>
         {
-            return this->immutable_ptr_(args...);
+            return this->immutable_ptr_(std::forward<A>(args)...);
         }
 
         template<typename ...B>
-        RT operator()(A... args, B... varargs) const noexcept requires std::is_same_v<T3, types::variadic_t>
+        RT operator()(A&&... args, B&&... varargs) const noexcept requires std::is_same_v<T3, types::variadic_t>
         {
-            return this->immutable_ptr_(args..., varargs...);
+            return this->immutable_ptr_(std::forward<A>(args)..., std::forward<B>(varargs)...);
         }
 
-        RT original(A... args) const noexcept requires std::is_same_v<T3, void>
+        RT original(A&&... args) const noexcept requires std::is_same_v<T3, void>
         {
-            return this->mutable_ptr_(args...);
+            return this->mutable_ptr_(std::forward<A>(args)...);
         }
 
         template<typename ...B>
-        RT original(A... args, B... varargs) const noexcept requires std::is_same_v<T3, types::variadic_t>
+        RT original(A&&... args, B&&... varargs) const noexcept requires std::is_same_v<T3, types::variadic_t>
         {
-            return this->mutable_ptr_(args..., varargs...);
+            return this->mutable_ptr_(std::forward<A>(args)..., std::forward<B>(varargs)...);
         }
     };
 }

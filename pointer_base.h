@@ -24,12 +24,12 @@ namespace moar
 
         [[nodiscard]] constexpr explicit operator auto () const noexcept { return get(); }
 
-        [[maybe_unused]] constexpr pointer_type release(this auto& self) const noexcept
+        [[maybe_unused]] constexpr pointer_type release(this auto& self) noexcept
         {
             return self.internal_release();
         }
 
-    	constexpr void reset(this auto&& self, concepts::Address auto new_ptr) const noexcept
+    	constexpr void reset(this auto&& self, concepts::Address auto new_ptr) noexcept
         {
             if constexpr (std::is_convertible_v<decltype(new_ptr), pointer_type>)
             {
