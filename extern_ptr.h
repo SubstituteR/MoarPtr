@@ -8,7 +8,7 @@ namespace moar
         using base = pointer_base<T>;
         friend base;
         constexpr base::pointer_type internal_release() const noexcept { auto rt = base::get(); internal_reset(); return rt; }
-        constexpr void internal_reset(base::pointer_type new_ptr = nullptr) const noexcept
+        constexpr void internal_reset(base::pointer_type new_ptr = nullptr) noexcept
         {
             this->immutable_ptr_ = new_ptr;
         }

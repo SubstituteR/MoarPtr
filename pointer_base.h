@@ -9,7 +9,7 @@ namespace moar
     protected:
         using element_type = std::remove_extent_t<T>;
         using pointer_type = std::add_pointer_t<element_type>;
-        mutable pointer_type immutable_ptr_;
+    	pointer_type immutable_ptr_;
         constexpr pointer_base() = default;
 
     public:
